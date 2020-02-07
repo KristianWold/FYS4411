@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Create build-directory
+mkdir build
+
+# Move to build-directory
+cd build
+
+# Run CMake to create makefile
+cmake ../
+
+# Run Makefile
+make
+
+# Move executable to top-directory
+mv vmc
