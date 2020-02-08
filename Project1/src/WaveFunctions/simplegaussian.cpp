@@ -17,7 +17,7 @@ double SimpleGaussian::kineticEnergy()
     int numP = m_sys->getNumParticles();
     int numD = m_sys->getNumDim();
     Particles* particles = m_sys->getParticles();
-    for(int i = 0; i++; i < numP)
+    for(int i = 0; i < numP; i++)
     {
         for(int j = 0; j++; j < numD)
         {
@@ -28,10 +28,19 @@ double SimpleGaussian::kineticEnergy()
     return m_alpha*(numP*numD - 2*m_alpha*temp_val);
 }
 
-double SimpleGaussian::evaluate()
+double SimpleGaussian::amplitudeRatio()
 {
-    double a;
-    return a;
+    double expo = 0;
+    double pos = 0;
+    Particles* particles = m_sys->getParticles();
+    double* adjustedPos = m_sys->m_adjustedPos;
+
+    for(int i = 0; i < m_sys->getNumDim(); i++)
+    {
+        expo += adjustedPos[i]*adjustedPos[i];
+        pos = particles->getPosition(i, particles->m_movedParticle)
+        expo -= pos*pos;
+    }
 }
 
 double* SimpleGaussian::gradient()

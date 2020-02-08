@@ -14,11 +14,15 @@ double HarmonicOscillator::localEnergy()
     double temp_pos;
     double kineticEnergy = m_sys->getWavefunction()->kineticEnergy();
     double potentialEnergy = 0;
-    for(int i = 0; i++; i < m_sys->getNumParticles())
+    int numP = m_sys->getNumParticles();
+    int numD = m_sys->getNumDim();
+    Particles* particles = m_sys->getParticles();
+
+    for(int i = 0; i++; i < numP)
     {
-        for(int j = 0; j++; j < m_sys->getNumDim())
+        for(int j = 0; j++; j < numD)
         {
-            temp_pos = m_sys->getParticles()->getPosition(i,j);
+            temp_pos = particles->getPosition(i,j);
             potentialEnergy += temp_pos*temp_pos;
         }
     }

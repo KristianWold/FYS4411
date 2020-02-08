@@ -11,7 +11,7 @@ int main() {
     System* sys = new System();
     sys->setNumParticles(2);
     sys->setNumDim(3);
-    sys->setParticles(new Particles(positions));
+    sys->setParticles(new Particles());
     sys->setWaveFunction(new SimpleGaussian(0.5));
     sys->setHamiltonian(new HarmonicOscillator(1));
 

@@ -7,7 +7,7 @@ class SimpleGaussian : public WaveFunction
 public:
     SimpleGaussian(double alpha);
     double kineticEnergy();
-    double evaluate();
+    double amplitudeRatio();
     double* gradient();
 
 private:
