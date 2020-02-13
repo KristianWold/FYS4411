@@ -6,17 +6,20 @@
 #include "src/WaveFunctions/simplegaussian.hpp"
 #include <iostream>
 
-int main() {
-    double positions[6] = {1,2,6,4,5,6};
+int main(int argc, char const *argv[]){
+
+    int numPart = atoi(argv[1]);
+    int numDim = atoi(argv[2]);
+    int numSteps = atoi(argv[3]);
     System* sys = new System();
-    sys->setNumParticles(2);
-    sys->setNumDim(3);
+    sys->setNumParticles(numPart);
+    sys->setNumDim(numDim);
     sys->setParticles(new Particles());
     sys->setWaveFunction(new SimpleGaussian(0.5));
     sys->setHamiltonian(new HarmonicOscillator(1));
 
-    std::cout << sys->getHamiltonian()->localEnergy() << std::endl;
-
+    //std::cout << sys->getHamiltonian()->localEnergy() << std::endl;
+    sys->runMetropolis(numSteps);
 
     return 0;
 }

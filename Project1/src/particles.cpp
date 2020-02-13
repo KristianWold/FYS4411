@@ -1,34 +1,48 @@
 #include "particles.hpp"
+#include "system.hpp"
 
-void Particles::setSystem(class System sys)
+void Particles::setSystem(class System* sys)
 {
     m_sys = sys;
-    positions = new double [m_sys->getNumParticles() * m_sys->getNumDim()];
-    adjustedPos = new double [m_sys->getNumDim()];
+    m_positions = new double [m_sys->getNumParticles() * m_sys->getNumDim()];
+    for(int i=0; i<m_sys->getNumParticles() * m_sys->getNumDim(); i++)
+    {
+        m_positions[i] = 1;
+    }
+    m_adjustedPos = new double [m_sys->getNumDim()];
 }
 
 double Particles::getPosition(int particle, int dim)
 {
-    return m_positions[dim*particle + dim];
+    return m_positions[m_sys->getNumDim()*particle + dim];
 }
 
-void proposeAdjustPos(double* step, int movedParticle)
+void Particles::proposeAdjustPos(double* step, int movedParticle)
 {
     m_movedParticle = movedParticle;
-    int numP = m_sys->getNumParticles();
     int numD = m_sys->getNumDim();
     for (int i = 0; i < numD; i++)
     {
-        adjustedPos[i] = positions[numP*movedParticle + i] + step[i];
+        m_adjustedPos[i] = m_positions[numD*m_movedParticle + i] + step[i];
     }
 }
 
-void commitAdjustPos()
+void Particles::commitAdjustPos()
 {
     int numP = m_sys->getNumParticles();
     int numD = m_sys->getNumDim();
-    for(int i = 0; i++; i < numD)
+    for(int i = 0; i < numD; i++)
     {
-        positions[numP*whichParticle + i] = adjustedPos[i];
+        m_positions[numP*m_movedParticle + i] = m_adjustedPos[i];
     }
+}
+
+double* Particles::getAdjustPos()
+{
+    return m_adjustedPos;
+}
+
+int Particles::getMovedParticle()
+{
+    return m_movedParticle;
 }

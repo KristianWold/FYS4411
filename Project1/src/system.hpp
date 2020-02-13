@@ -10,6 +10,7 @@ public:
     void setHamiltonian(class Hamiltonian* hamiltonian);
     void setWaveFunction(class WaveFunction* wavefunction);
     void setParticles(class Particles* particles);
+    void setSeed(int seed);
 
     int getNumParticles(){return m_numParticles;}
     int getNumDim(){return m_numDim;}
@@ -23,9 +24,11 @@ public:
 protected:
     int m_numParticles;
     int m_numDim;
+    double m_stepLength = 0.1;
     class Hamiltonian* m_hamiltonian;
     class WaveFunction* m_wavefunction;
     class Particles* m_particles;
 
-    int m_seed;
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dist;
 };

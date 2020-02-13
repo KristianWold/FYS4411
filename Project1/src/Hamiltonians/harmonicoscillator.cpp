@@ -18,9 +18,9 @@ double HarmonicOscillator::localEnergy()
     int numD = m_sys->getNumDim();
     Particles* particles = m_sys->getParticles();
 
-    for(int i = 0; i++; i < numP)
+    for(int i = 0; i < numP; i++)
     {
-        for(int j = 0; j++; j < numD)
+        for(int j = 0; j < numD; j++)
         {
             temp_pos = particles->getPosition(i,j);
             potentialEnergy += temp_pos*temp_pos;
