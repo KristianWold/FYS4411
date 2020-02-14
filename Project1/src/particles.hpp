@@ -9,7 +9,7 @@ public:
     double getPosition(int particle, int dim);
     double* getAdjustPos();
     int getMovedParticle();
-    void proposeAdjustPos(double* step, int whichParticle);
+    void proposeAdjustPos(double* step, int movedParticle);
     void commitAdjustPos();
 
 protected:

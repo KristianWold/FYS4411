@@ -15,10 +15,8 @@ int main(int argc, char const *argv[]){
     sys->setNumParticles(numPart);
     sys->setNumDim(numDim);
     sys->setParticles(new Particles());
-    sys->setWaveFunction(new SimpleGaussian(0.5));
+    sys->setWaveFunction(new SimpleGaussian(0.3));
     sys->setHamiltonian(new HarmonicOscillator(1));
-
-    //std::cout << sys->getHamiltonian()->localEnergy() << std::endl;
     sys->runMetropolis(numSteps);
 
     return 0;

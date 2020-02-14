@@ -13,7 +13,7 @@ SimpleGaussian::SimpleGaussian(double alpha)
 double SimpleGaussian::kineticEnergy()
 {
     double temp_pos;
-    double temp_val;
+    double temp_val = 0;
     int numP = m_sys->getNumParticles();
     int numD = m_sys->getNumDim();
     Particles* particles = m_sys->getParticles();
