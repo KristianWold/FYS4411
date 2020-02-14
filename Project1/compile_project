@@ -14,3 +14,4 @@ make
 
 # Move executable to top-directory
 mv vmc ../
+mv runUnitTests ../

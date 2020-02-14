@@ -10,7 +10,7 @@ include_directories(
 
 # Add sources from all directories
 file(
-    GLOB SOURCES "*.cpp"
+    GLOB SOURCES "main.cpp"
     GLOB SOURCES "src/*.cpp"
     GLOB SOURCES "src/Hamiltonians/*.cpp"
     GLOB SOURCES "src/WaveFunctions/*.cpp"
@@ -18,3 +18,20 @@ file(
 
 # Create executable called "vmc"
 add_executable(vmc ${SOURCES})
+
+
+# Testing
+add_subdirectory(./googletest)
+
+# Add sources from all directories
+file(
+    GLOB TESTSOURCES "test.cpp"
+    GLOB TESTSOURCES "src/*.cpp"
+    GLOB TESTSOURCES "src/Hamiltonians/*.cpp"
+    GLOB TESTSOURCES "src/WaveFunctions/*.cpp"
+    GLOB TESTSOURCES "src/WaveFunctions/*.cpp"
+)
+
+add_executable(runUnitTests ${TESTSOURCES})
+
+target_link_libraries(runUnitTests gtest gtest_main)
