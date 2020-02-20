@@ -4,6 +4,7 @@
 #include "src/Hamiltonians/harmonicoscillator.hpp"
 #include "src/WaveFunctions/wavefunction.hpp"
 #include "src/WaveFunctions/simplegaussian.hpp"
+#include "src/WaveFunctions/simplegaussiannumerical.hpp"
 #include <iostream>
 
 int main(int argc, char const *argv[]){
@@ -15,7 +16,8 @@ int main(int argc, char const *argv[]){
     sys->setNumParticles(numPart);
     sys->setNumDim(numDim);
     sys->setParticles(new Particles());
-    sys->setWaveFunction(new SimpleGaussian(0.3));
+    sys->setWaveFunction(new SimpleGaussian(0.5));
+    //sys->setWaveFunction(new SimpleGaussian(0.5));
     sys->setHamiltonian(new HarmonicOscillator(1));
     sys->runMetropolis(numSteps);
 

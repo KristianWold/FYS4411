@@ -20,21 +20,26 @@ double* System::step()
 
 void System::runMetropolis(int numMetropolisSteps)
 {
+    double amp;
+    int total = 0;
 
     for(int i=0; i < numMetropolisSteps; i++)
     {
-        //std::cout << step()[0] << std::endl;
+        amp = m_wavefunction->amplitudeRatio();
         m_particles->proposeAdjustPos(step(), i%m_numParticles);
-        //std::cout << m_wavefunction->amplitudeRatio() << "  " << dist(gen) << std::endl;
-        if (m_wavefunction->amplitudeRatio() > dist(gen))
+        if (amp > dist(gen))
         {
-            //std::cout << "success  " << i << std::endl;
+            total+=1;
             m_particles->commitAdjustPos();
-
-        //    std::cout << m_particles->getPosition(1,2) << std::endl;
         }
-        std::cout << m_hamiltonian->localEnergy() << std::endl;
+        //std::cout << dist(gen) << std::endl;
+        //std::cout << m_wavefunction->amplitudeRatio() << std::endl;
+        //std::cout << m_particles->getAdjustPos()[0] << std::endl;
+        //std::cout << step()[0] << std::endl;
+        //std::cout << 1.00001 << std::endl;
+        //std::cout << m_hamiltonian->localEnergy() << std::endl;
     }
+    std::cout << total <<"/" << numMetropolisSteps << std::endl;
 }
 
 

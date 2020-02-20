@@ -24,7 +24,7 @@ public:
 protected:
     int m_numParticles;
     int m_numDim;
-    double m_stepLength = 0.1;
+    double m_stepLength = 0.05;
     class Hamiltonian* m_hamiltonian;
     class WaveFunction* m_wavefunction;
     class Particles* m_particles;

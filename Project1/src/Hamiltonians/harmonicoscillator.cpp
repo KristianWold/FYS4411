@@ -12,7 +12,7 @@ HarmonicOscillator::HarmonicOscillator(double omega)
 double HarmonicOscillator::localEnergy()
 {
     double temp_pos;
-    double kineticEnergy = m_sys->getWavefunction()->kineticEnergy();
+    double kineticEnergy = -0.5*(m_sys->getWavefunction()->laplacian());
     double potentialEnergy = 0;
     int numP = m_sys->getNumParticles();
     int numD = m_sys->getNumDim();

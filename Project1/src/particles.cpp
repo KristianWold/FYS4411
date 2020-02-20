@@ -1,5 +1,6 @@
 #include "particles.hpp"
 #include "system.hpp"
+#include <iostream>
 
 void Particles::setSystem(class System* sys)
 {
@@ -15,6 +16,11 @@ void Particles::setSystem(class System* sys)
 double Particles::getPosition(int particle, int dim)
 {
     return m_positions[m_sys->getNumDim()*particle + dim];
+}
+
+void Particles::adjustPos(double step, int movedParticle, int dim)
+{
+    m_positions[m_sys->getNumDim()*movedParticle + dim] += step;
 }
 
 void Particles::proposeAdjustPos(double* step, int movedParticle)
