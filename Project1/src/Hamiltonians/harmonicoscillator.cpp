@@ -22,7 +22,7 @@ double HarmonicOscillator::localEnergy()
     {
         for(int j = 0; j < numD; j++)
         {
-            temp_pos = particles->getPosition(i,j);
+            temp_pos = particles->position(i,j);
             potentialEnergy += temp_pos*temp_pos;
         }
     }

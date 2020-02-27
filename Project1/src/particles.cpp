@@ -2,7 +2,7 @@
 #include "system.hpp"
 #include <iostream>
 
-void Particles::setSystem(class System* sys)
+void Particles::setSystem(System* sys)
 {
     m_sys = sys;
     m_positions = new double [m_sys->getNumParticles() * m_sys->getNumDim()];
@@ -13,7 +13,7 @@ void Particles::setSystem(class System* sys)
     m_adjustedPos = new double [m_sys->getNumDim()];
 }
 
-double Particles::getPosition(int particle, int dim)
+double& Particles::position(int particle, int dim)
 {
     return m_positions[m_sys->getNumDim()*particle + dim];
 }

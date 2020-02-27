@@ -20,7 +20,7 @@ double SimpleGaussian::evaluate()
     {
         for (int j = 0; j < m_sys->getNumDim(); j++)
         {
-            pos = particles->getPosition(i, j);
+            pos = particles->position(i, j);
             expo += pos*pos;
         }
 
@@ -39,7 +39,7 @@ double SimpleGaussian::laplacian()
     {
         for(int j = 0; j < numD; j++)
         {
-            temp_pos = particles->getPosition(i,j);
+            temp_pos = particles->position(i, j);
             temp_val += temp_pos*temp_pos;
         }
     }
@@ -57,7 +57,7 @@ double SimpleGaussian::amplitudeRatio()
     for(int i = 0; i < m_sys->getNumDim(); i++)
     {
         expo += adjustedPos[i]*adjustedPos[i];
-        pos = particles->getPosition(particles->getMovedParticle(), i);
+        pos = particles->position(particles->getMovedParticle(), i);
         expo -= pos*pos;
     }
     //std::cout << expo << std::endl;

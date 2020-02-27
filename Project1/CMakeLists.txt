@@ -4,6 +4,7 @@ project(project_1_FYS4411)
 # Add directories containing header-files
 include_directories(
     src
+    src/InitialStates
     src/Hamiltonian
     src/WaveFunction
 )
@@ -12,6 +13,7 @@ include_directories(
 file(
     GLOB SOURCES "main.cpp"
     GLOB SOURCES "src/*.cpp"
+    GLOB SOURCES "src/InitialStates/*.cpp"
     GLOB SOURCES "src/Hamiltonians/*.cpp"
     GLOB SOURCES "src/WaveFunctions/*.cpp"
 )
@@ -27,9 +29,10 @@ add_subdirectory(./googletest)
 file(
     GLOB TESTSOURCES "test.cpp"
     GLOB TESTSOURCES "src/*.cpp"
+    GLOB TESTSOURCES "src/InitialStates/*.cpp"
     GLOB TESTSOURCES "src/Hamiltonians/*.cpp"
     GLOB TESTSOURCES "src/WaveFunctions/*.cpp"
-    GLOB TESTSOURCES "src/WaveFunctions/*.cpp"
+
 )
 
 add_executable(runUnitTests ${TESTSOURCES})

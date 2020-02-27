@@ -1,6 +1,7 @@
 #include "system.hpp"
-#include "WaveFunctions/wavefunction.hpp"
+#include "InitialStates/initialstate.hpp"
 #include "Hamiltonians/hamiltonian.hpp"
+#include "WaveFunctions/wavefunction.hpp"
 #include "particles.hpp"
 
 #include <random>
@@ -23,6 +24,8 @@ void System::runMetropolis(int numMetropolisSteps)
     double amp;
     int total = 0;
 
+    m_initState->setupInitialSystem();
+
     for(int i=0; i < numMetropolisSteps; i++)
     {
         amp = m_wavefunction->amplitudeRatio();
@@ -32,32 +35,31 @@ void System::runMetropolis(int numMetropolisSteps)
             total+=1;
             m_particles->commitAdjustPos();
         }
-        //std::cout << dist(gen) << std::endl;
-        //std::cout << m_wavefunction->amplitudeRatio() << std::endl;
-        //std::cout << m_particles->getAdjustPos()[0] << std::endl;
-        //std::cout << step()[0] << std::endl;
-        //std::cout << 1.00001 << std::endl;
-        //std::cout << m_hamiltonian->localEnergy() << std::endl;
     }
     std::cout << total <<"/" << numMetropolisSteps << std::endl;
 }
 
+void System::setInitialState(InitialState* initState)
+{
+    m_initState = initState;
+    m_initState->setSystem(this);
+}
 
-void System::setHamiltonian(class Hamiltonian* hamiltonian)
+void System::setHamiltonian(Hamiltonian* hamiltonian)
 {
     m_hamiltonian = hamiltonian;
     m_hamiltonian->setSystem(this);
 }
 
 
-void System::setWaveFunction(class WaveFunction* wavefunction)
+void System::setWaveFunction(WaveFunction* wavefunction)
 {
     m_wavefunction = wavefunction;
     m_wavefunction->setSystem(this);
 }
 
 
-void System::setParticles(class Particles* particles)
+void System::setParticles(Particles* particles)
 {
     m_particles = particles;
     m_particles->setSystem(this);

@@ -1,13 +1,11 @@
 #pragma once
 
-class Hamiltonian
+
+class InitialState
 {
 public:
     void setSystem(class System* sys){m_sys = sys;}
-    System* getSystem(){return m_sys;}
-
-    virtual double localEnergy() = 0;
-
+    virtual void setupInitialSystem();
 
 protected:
     class System* m_sys;
