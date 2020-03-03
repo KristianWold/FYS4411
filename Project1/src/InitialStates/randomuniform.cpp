@@ -3,9 +3,10 @@
 #include "../system.hpp"
 #include "../particles.hpp"
 
-void RandomUniform::setupInitialSystem()
+
+void RandomUniform::initiate()
 {
-    InitialState::setupInitialSystem();
+    InitialState::initiate();
     int numPart = m_sys->getNumParticles();
     int numDim = m_sys->getNumDim();
     Particles* particles = m_sys->getParticles();

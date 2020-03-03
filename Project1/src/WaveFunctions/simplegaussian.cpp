@@ -60,9 +60,7 @@ double SimpleGaussian::amplitudeRatio()
         pos = particles->position(particles->getMovedParticle(), i);
         expo -= pos*pos;
     }
-    //std::cout << expo << std::endl;
-    //std::cout << std::exp(-2*m_alpha*expo) << std::endl;
-    return std::exp(m_alpha*expo);
+    return std::exp(-2*m_alpha*expo);
 }
 
 

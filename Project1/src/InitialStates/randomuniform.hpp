@@ -5,5 +5,5 @@
 class RandomUniform : public InitialState
 {
 public:
-    void setupInitialSystem();
+    void initiate();
 };

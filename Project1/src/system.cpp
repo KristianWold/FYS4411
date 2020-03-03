@@ -3,6 +3,7 @@
 #include "Hamiltonians/hamiltonian.hpp"
 #include "WaveFunctions/wavefunction.hpp"
 #include "particles.hpp"
+#include "sampler.hpp"
 
 #include <random>
 #include <iostream>
@@ -10,33 +11,41 @@
 
 double* System::step()
 {
-    double* step_ = new double [m_numDim];
-    for(int i = 0; i < m_numDim; i++)
+    double* step_ = new double [getNumDim()];
+    for(int i = 0; i < getNumDim(); i++)
     {
-        step_[i] = 2*m_stepLength*(dist(gen) - 0.5);
+        step_[i] = 2*m_stepLength*(getRandomUniform() - 0.5);
     }
     return step_;
 }
 
-
-void System::runMetropolis(int numMetropolisSteps)
+void System::initiate()
 {
-    double amp;
+    m_initState->initiate();
+    m_sampler->initiate();
+}
+
+void System::runMetropolis()
+{
+    bool accepted;
     int total = 0;
+    initiate();
+    getSampler()->sample(true);
 
-    m_initState->setupInitialSystem();
-
-    for(int i=0; i < numMetropolisSteps; i++)
+    for(int i=0; i < m_metropolisSteps - 1; i++)
     {
-        amp = m_wavefunction->amplitudeRatio();
-        m_particles->proposeAdjustPos(step(), i%m_numParticles);
-        if (amp > dist(gen))
+        getParticles()->proposeAdjustPos(step(), i%m_numParticles);
+        accepted = (getWavefunction()->amplitudeRatio() > getRandomUniform());
+
+        if (accepted)
         {
-            total+=1;
-            m_particles->commitAdjustPos();
+            getParticles()->commitAdjustPos();
+            total += 1;
         }
+        getSampler()->sample(accepted);
     }
-    std::cout << total <<"/" << numMetropolisSteps << std::endl;
+    getSampler()->writeToFile();
+    std::cout << total << "/" << m_metropolisSteps << std::endl;
 }
 
 void System::setInitialState(InitialState* initState)
@@ -65,8 +74,14 @@ void System::setParticles(Particles* particles)
     m_particles->setSystem(this);
 }
 
+void System::setSampler(Sampler* sampler)
+{
+    m_sampler = sampler;
+    m_sampler->setSystem(this);
+}
+
 void System::setSeed(int seed)
 {
-    std::mt19937 gen(seed);
-    std::uniform_real_distribution<double> dist(0, 1);
+    gen = new std::mt19937(seed);
+    dist = new std::uniform_real_distribution<double>(0, 1);
 }

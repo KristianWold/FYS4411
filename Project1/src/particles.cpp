@@ -20,7 +20,7 @@ double& Particles::position(int particle, int dim)
 
 void Particles::adjustPos(double step, int movedParticle, int dim)
 {
-    m_positions[m_sys->getNumDim()*movedParticle + dim] += step;
+    position(movedParticle, dim) += step;
 }
 
 void Particles::proposeAdjustPos(double* step, int movedParticle)
@@ -29,17 +29,15 @@ void Particles::proposeAdjustPos(double* step, int movedParticle)
     int numD = m_sys->getNumDim();
     for (int i = 0; i < numD; i++)
     {
-        m_adjustedPos[i] = m_positions[numD*m_movedParticle + i] + step[i];
+        m_adjustedPos[i] = position(m_movedParticle, i) + step[i];
     }
 }
 
 void Particles::commitAdjustPos()
 {
-    int numP = m_sys->getNumParticles();
-    int numD = m_sys->getNumDim();
-    for(int i = 0; i < numD; i++)
+    for(int i = 0; i < m_sys->getNumDim(); i++)
     {
-        m_positions[numD*m_movedParticle + i] = m_adjustedPos[i];
+        position(m_movedParticle, i) = m_adjustedPos[i];
     }
 }
 
