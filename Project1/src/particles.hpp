@@ -7,6 +7,7 @@ public:
     System* getSystem(){return m_sys;}
 
     double& position(int particle, int dim);
+    double* position(int particle);
     double* getAdjustPos();
     int getMovedParticle();
     void adjustPos(double step, int movedParticle, int dim);
@@ -14,7 +15,7 @@ public:
     void commitAdjustPos();
 
 protected:
-    double* m_positions;
+    double** m_positions;
     double* m_adjustedPos;
     System* m_sys;
     int m_movedParticle;

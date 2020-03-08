@@ -15,10 +15,12 @@ double SimpleGaussian::evaluate()
     double expo = 0;
     double pos = 0;
     Particles* particles = m_sys->getParticles();
+    int numPart = m_sys->getNumParticles();
+    int numDim = m_sys->getNumDim();
 
-    for(int i = 0; i < m_sys->getNumParticles(); i++)
+    for(int i = 0; i < numPart; i++)
     {
-        for (int j = 0; j < m_sys->getNumDim(); j++)
+        for (int j = 0; j < numDim; j++)
         {
             pos = particles->position(i, j);
             expo += pos*pos;
@@ -47,6 +49,9 @@ double SimpleGaussian::laplacian()
 }
 
 
+void SimpleGaussian::initiate(){};
+
+
 double SimpleGaussian::amplitudeRatio()
 {
     double expo = 0;
@@ -64,8 +69,10 @@ double SimpleGaussian::amplitudeRatio()
 }
 
 
-double* SimpleGaussian::gradient()
+void SimpleGaussian::gradient(double* gradient, int particle, double* position)
 {
-    double* a;
-    return a;
+    for (int i = 0; i < m_sys->getNumDim(); i++)
+    {
+        gradient[i] = -2*m_alpha*position[i];
+    }
 }

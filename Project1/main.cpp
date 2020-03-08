@@ -28,9 +28,8 @@ int main(int argc, char const *argv[]){
     sys->setHamiltonian(new HarmonicOscillator(1));
     sys->setSampler(new Sampler());
     sys->setMetropolisSteps(numSteps);
-    sys->setSeed(39);
+    sys->setSeed(42);
 
     sys->runMetropolis();
-
     return 0;
 }

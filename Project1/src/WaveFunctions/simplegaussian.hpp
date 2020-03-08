@@ -9,7 +9,8 @@ public:
     double laplacian();
     double evaluate();
     double amplitudeRatio();
-    double* gradient();
+    void gradient(double* gradient, int particle, double* position);
+    void initiate();
 
 private:
     double m_alpha;

@@ -27,17 +27,23 @@ public:
     WaveFunction* getWavefunction(){return m_wavefunction;}
     Particles* getParticles(){return m_particles;}
     Sampler* getSampler(){return m_sampler;}
-    double getRandomUniform(){return (*dist)(*gen);}
+    double getRandomUniform(){return (*distUniform)(*gen);}
+    double getRandomNormal(){return (*distNormal)(*gen);}
 
     void initiate();
     void runMetropolis();
-    double* step();
+    double greenFunction(double dt);
+    double* step(int particle);
+    double* step2(int particle);
 
 protected:
     int m_numParticles;
     int m_numDim;
     int m_metropolisSteps;
     double m_stepLength;
+    double* m_step;
+    double* m_gradientOld;
+    double* m_gradientNew;
 
     InitialState* m_initState;
     Hamiltonian* m_hamiltonian;
@@ -46,5 +52,6 @@ protected:
     Sampler* m_sampler;
 
     std::mt19937* gen;
-    std::uniform_real_distribution<double>* dist;
+    std::uniform_real_distribution<double>* distUniform;
+    std::normal_distribution<double>* distNormal;
 };
