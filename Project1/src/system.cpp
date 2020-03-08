@@ -83,9 +83,9 @@ void System::runMetropolis()
     for(int i=0; i < m_metropolisSteps - 1; i++)
     {
         particle = i%m_numParticles;
-        getParticles()->proposeAdjustPos(step(particle), particle);
+        getParticles()->proposeAdjustPos(step2(particle), particle);
 
-        accepted = (getWavefunction()->amplitudeRatio() > getRandomUniform());
+        accepted = (greenFunction(m_stepLength)*getWavefunction()->amplitudeRatio() > getRandomUniform());
 
         if (accepted)
         {
@@ -95,7 +95,7 @@ void System::runMetropolis()
 
         getSampler()->sample(accepted);
     }
-    
+
     std::cout << total << "/" << m_metropolisSteps << std::endl;
     getSampler()->close();
 }

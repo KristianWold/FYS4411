@@ -1,5 +1,6 @@
 import numpy as np
 import subprocess
+from numba import jit
 
 
 def smoothing(x, smoothing_window):
@@ -49,3 +50,14 @@ def statistics(localEnergies):
     varE = np.var(localEnergies[cutoff:])
 
     return meanE, varE
+
+
+def oneBodyDensity(configurations, bins):
+    count = np.zeros(bins.shape[0])
+
+    for config in configurations:
+        for particlePos in config:
+            r = np.linalg.norm(particlePos)
+            ting = (bins[:-1] < r) & (r < bins[1:])
+            count[np.where(ting)[0]] += 1
+    return count / configurations.shape[0]
