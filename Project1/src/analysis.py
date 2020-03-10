@@ -61,3 +61,8 @@ def oneBodyDensity(configurations, bins):
             ting = (bins[:-1] < r) & (r < bins[1:])
             count[np.where(ting)[0]] += 1
     return count / configurations.shape[0]
+
+
+def blocking(x):
+    x_blocked = [np.mean(i) for i in x.reshape(-1, 2)]
+    return np.array(x_blocked)
