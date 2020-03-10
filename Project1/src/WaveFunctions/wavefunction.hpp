@@ -10,6 +10,7 @@ public:
     virtual double amplitudeRatio() = 0;
     virtual void gradient(double* gradient, int particle, double* position) = 0;
     virtual double laplacian() = 0;
+    virtual double gradAlpha() = 0;
     virtual void initiate(){};
 
 protected:

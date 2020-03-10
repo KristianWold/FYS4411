@@ -10,6 +10,7 @@ public:
     double evaluate();
     double amplitudeRatio();
     void gradient(double* gradient, int particle, double* position);
+    double gradAlpha();
     void initiate();
 
 private:

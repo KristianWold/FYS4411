@@ -429,3 +429,4 @@ dmypy.json
 # /**/build/*
 
 *.txt
+!CMakeLists.txt

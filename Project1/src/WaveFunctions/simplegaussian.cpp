@@ -49,6 +49,27 @@ double SimpleGaussian::laplacian()
 }
 
 
+double SimpleGaussian::gradAlpha()
+{
+    double temp = 0;
+    double pos = 0;
+    Particles* particles = m_sys->getParticles();
+    int numPart = m_sys->getNumParticles();
+    int numDim = m_sys->getNumDim();
+
+    for(int i = 0; i < numPart; i++)
+    {
+        for (int j = 0; j < numDim; j++)
+        {
+            pos = particles->position(i, j);
+            temp += pos*pos;
+        }
+
+    }
+    return -temp;
+}
+
+
 void SimpleGaussian::initiate(){};
 
 
