@@ -9,7 +9,7 @@
 #include <iostream>
 #include <cmath>
 
-double* System::step(int particle)
+double* System::stepBruteForce(int particle)
 {
     for(int i = 0; i < getNumDim(); i++)
     {
@@ -19,7 +19,7 @@ double* System::step(int particle)
 }
 
 
-double* System::step2(int particle)
+double* System::stepImportanceSampling(int particle)
 {
     Particles* particles = getParticles();
     double* position = particles->position(particle);
@@ -60,6 +60,15 @@ double System::greenFunction(double dt)
     return std::exp(expo);
 }
 
+double System::acceptanceRatioBruteForce()
+{
+    return getWavefunction()->amplitudeRatio();
+}
+
+double System::acceptanceRatioImportanceSampling()
+{
+    return greenFunction(m_stepLength)*getWavefunction()->amplitudeRatio();
+}
 
 void System::initiate()
 {
@@ -73,6 +82,8 @@ void System::initiate()
 }
 
 
+
+
 void System::runMetropolis()
 {
     bool accepted;
@@ -80,12 +91,15 @@ void System::runMetropolis()
     initiate();
     getSampler()->sample(true);
 
+    step = &System::stepImportanceSampling;
+    acceptanceRatio = &System::acceptanceRatioImportanceSampling;
+
     for(int i=0; i < m_metropolisSteps - 1; i++)
     {
         particle = i%m_numParticles;
-        getParticles()->proposeAdjustPos(step2(particle), particle);
+        getParticles()->proposeAdjustPos((this->*step)(particle), particle);
 
-        accepted = (greenFunction(m_stepLength)*getWavefunction()->amplitudeRatio() > getRandomUniform());
+        accepted = ((this->*acceptanceRatio)() > getRandomUniform());
 
         if (accepted)
         {

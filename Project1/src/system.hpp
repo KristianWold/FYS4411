@@ -33,8 +33,14 @@ public:
     void initiate();
     void runMetropolis();
     double greenFunction(double dt);
-    double* step(int particle);
-    double* step2(int particle);
+
+    double* (System::*step)(int particle);
+    double* stepBruteForce(int particle);
+    double* stepImportanceSampling(int particle);
+
+    double (System::*acceptanceRatio)();
+    double acceptanceRatioBruteForce();
+    double acceptanceRatioImportanceSampling();
 
 protected:
     int m_numParticles;
