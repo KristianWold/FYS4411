@@ -8,6 +8,7 @@
 #include "src/WaveFunctions/wavefunction.hpp"
 #include "src/WaveFunctions/simplegaussian.hpp"
 #include "src/WaveFunctions/simplegaussiannumerical.hpp"
+#include "src/WaveFunctions/hardshell.hpp"
 #include <iostream>
 
 int main(int argc, char const *argv[]){
@@ -17,6 +18,8 @@ int main(int argc, char const *argv[]){
     int numSteps = atoi(argv[3]);
     double stepLength = atof(argv[4]);
     double alpha = atof(argv[5]);
+    double a = atof(argv[6]);
+    double omega = atof(argv[7]);
 
     System* sys = new System();
 
@@ -24,8 +27,8 @@ int main(int argc, char const *argv[]){
     sys->setNumParticles(numPart);
     sys->setNumDim(numDim);
     sys->setInitialState(new RandomUniform());
-    sys->setWaveFunction(new SimpleGaussian(alpha));
-    sys->setHamiltonian(new HarmonicOscillator(1));
+    sys->setWaveFunction(new Hardshell(alpha, a));
+    sys->setHamiltonian(new HarmonicOscillator(omega));
     sys->setSampler(new Sampler());
     sys->setMetropolisSteps(numSteps);
     sys->setSeed(42);

@@ -35,7 +35,8 @@ def thermalize_cutoff(localEnergies, smoothing_window, tol):
 
 
 def runner(conf):
-    args = ["./vmc", "numPart", "numDim", "numSteps", "stepLength", "alpha"]
+    args = ["./vmc", "numPart", "numDim",
+            "numSteps", "stepLength", "alpha", "a", "omega"]
     for i in range(1, len(args)):
         args[i] = str(conf[args[i]])
 
@@ -52,15 +53,24 @@ def statistics(localEnergies):
     return meanE, varE
 
 
-def oneBodyDensity(configurations, bins):
+def oneBodyDensity(configurations, bins, mode="radial"):
     count = np.zeros(bins.shape[0])
 
-    for config in configurations:
-        for particlePos in config:
-            r = np.linalg.norm(particlePos)
-            ting = (bins[:-1] < r) & (r < bins[1:])
-            count[np.where(ting)[0]] += 1
-    return count / configurations.shape[0]
+    if mode == "radial":
+        for config in configurations:
+            for particlePos in config:
+                r = np.linalg.norm(particlePos)
+                ting = (bins[:-1] < r) & (r < bins[1:])
+                count[np.where(ting)[0]] += 1
+        return count / configurations.shape[0]
+
+    if mode == "1D":
+        for config in configurations:
+            for particlePos in config:
+                x = particlePos[0]
+                ting = (bins[:-1] < x) & (x < bins[1:])
+                count[np.where(ting)[0]] += 1
+        return count / configurations.shape[0]
 
 
 def blocking(x):

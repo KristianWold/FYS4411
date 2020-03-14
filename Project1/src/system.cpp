@@ -82,8 +82,6 @@ void System::initiate()
 }
 
 
-
-
 void System::runMetropolis()
 {
     bool accepted;
