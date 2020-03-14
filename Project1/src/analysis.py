@@ -1,6 +1,7 @@
 import numpy as np
 import subprocess
 from numba import jit
+from tqdm import tqdm
 
 
 def smoothing(x, smoothing_window):
@@ -53,24 +54,34 @@ def statistics(localEnergies):
     return meanE, varE
 
 
-def oneBodyDensity(configurations, bins, mode="radial"):
-    count = np.zeros(bins.shape[0])
+def oneBodyDensity(pos, bins, mode="radial"):
 
     if mode == "radial":
-        for config in configurations:
-            for particlePos in config:
-                r = np.linalg.norm(particlePos)
-                ting = (bins[:-1] < r) & (r < bins[1:])
-                count[np.where(ting)[0]] += 1
-        return count / configurations.shape[0]
+        r = np.linalg.norm(pos, axis=2)
+        ting = (bins[:-1, None, None] < r) & (r < bins[1:, None, None])
+        print(ting.shape)
+        count = np.sum(ting, axis=(1, 2)) / pos.shape[0]
+        return count
 
     if mode == "1D":
-        for config in configurations:
-            for particlePos in config:
-                x = particlePos[0]
-                ting = (bins[:-1] < x) & (x < bins[1:])
-                count[np.where(ting)[0]] += 1
-        return count / configurations.shape[0]
+        x =\
+            (bins[:-1, None, None] < pos[:, :, 0]) &\
+            (pos[:, :, 0] < bins[1:, None, None])
+
+        count = np.sum(x, axis=(1, 2)) / pos.shape[0]
+        return count
+
+    if mode == "2D":
+        count = np.zeros((bins.shape[0], bins.shape[0]))
+        y_min = x_min = bins[0]
+        dy = dx = bins[1] - bins[0]
+        for x, y in tqdm(pos):
+            try:
+                count[int((x - x_min) // dx), int((y - y_min) // dy)] += 1
+            except:
+                pass
+
+        return count
 
 
 def blocking(x):
