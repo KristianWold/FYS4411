@@ -15,27 +15,31 @@
 
 int main(int argc, char const *argv[]){
 
-    std::string name = argv[1];
-    int numPart = atoi(argv[2]);
-    int numDim = atoi(argv[3]);
-    int numSteps = atoi(argv[4]);
-    double stepLength = atof(argv[5]);
-    double alpha = atof(argv[6]);
-    double a = atof(argv[7]);
-    double omega = atof(argv[8]);
+    std::string directory = argv[1];
+    std::string thread = argv[2];
+    int numPart = atoi(argv[3]);
+    int numDim = atoi(argv[4]);
+    int numSteps = atoi(argv[5]);
+    double stepLength = atof(argv[6]);
+    double alpha = atof(argv[7]);
+    double a = atof(argv[8]);
+    double omega = atof(argv[9]);
 
     System* sys = new System();
 
-    sys->setName(name);
+    sys->setDirectory(directory);
+    sys->setThread(thread);
+
     sys->setStepLength(stepLength);
     sys->setNumParticles(numPart);
     sys->setNumDim(numDim);
+
     sys->setInitialState(new InitialHardshell());
     sys->setWaveFunction(new Hardshell(alpha, a));
     sys->setHamiltonian(new HarmonicOscillator(omega));
     sys->setSampler(new Sampler());
     sys->setMetropolisSteps(numSteps);
-    sys->setSeed(42);
+    sys->setSeed(42 + atoi(argv[2]) - 1);
 
     sys->runMetropolis();
     return 0;

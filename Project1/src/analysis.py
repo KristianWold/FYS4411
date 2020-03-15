@@ -2,6 +2,8 @@ import numpy as np
 import subprocess
 from tqdm import tqdm
 import os
+import shutil
+import multiprocessing
 
 
 def smoothing(x, smoothing_window):
@@ -35,19 +37,30 @@ def thermalize_cutoff(localEnergies, smoothing_window, tol):
     return cutoff
 
 
-def runner(conf):
-    try:
-        os.mkdir(conf["name"])
-    except:
-        pass
+def runner(conf, threads=1):
 
-    args = ["./vmc", "name", "numPart", "numDim",
-            "numSteps", "stepLength", "alpha", "a", "omega"]
-    for i in range(1, len(args)):
-        args[i] = str(conf[args[i]])
+    dir = conf["directory"]
+    if os.path.exists(dir):
+        shutil.rmtree(dir)
+    os.mkdir(dir)
 
-    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-    assert (popen.wait() == 0)
+    params = ["numPart", "numDim", "numSteps",
+              "stepLength", "alpha", "a", "omega"]
+
+    for i in range(len(params)):
+        params[i] = str(conf[params[i]])
+
+    args = []
+    for i in range(threads):
+        args.append(["./vmc", conf["directory"], str(i)] + params)
+
+    processes = []
+    for a in args:
+        process = subprocess.Popen(a, stdout=subprocess.PIPE)
+        processes.append(process)
+
+    for process in processes:
+        assert (process.wait() == 0)
 
 
 def statistics(localEnergies):
@@ -69,12 +82,16 @@ def oneBodyDensity(pos, bins, mode="radial"):
         return count
 
     if mode == "1D":
-        x =\
-            (bins[:-1, None, None] < pos[:, :, 0]) &\
-            (pos[:, :, 0] < bins[1:, None, None])
+        count = np.zeros(bins.shape[0])
+        x_min = bins[0]
+        dx = bins[1] - bins[0]
+        for x in tqdm(pos):
+            try:
+                count[int((x - x_min) // dx)] += 1
+            except:
+                pass
 
-        count = np.sum(x, axis=(1, 2)) / pos.shape[0]
-        return count
+        return count / pos.shape[0]
 
     if mode == "2D":
         count = np.zeros((bins.shape[0], bins.shape[0]))
@@ -86,7 +103,7 @@ def oneBodyDensity(pos, bins, mode="radial"):
             except:
                 pass
 
-        return count
+        return count / pos.shape[0]
 
 
 def blocking(x):

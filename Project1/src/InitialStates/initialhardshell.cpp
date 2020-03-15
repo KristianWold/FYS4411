@@ -30,7 +30,6 @@ void InitialHardshell::initiate()
     double corr = 0;
     double temp;
     double* pos1, *pos2;
-    //int a = std::static_cast<int>(0.4)
 
     while ((corr == 0) and (count < maxCount))
     {
@@ -50,6 +49,7 @@ void InitialHardshell::initiate()
                 }
             }
         }
+        std::cout << corr << std::endl;
         std *= 2;
         count += 1;
     }

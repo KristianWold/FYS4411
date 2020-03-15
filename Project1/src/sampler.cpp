@@ -7,15 +7,25 @@
 #include <fstream>
 #include <iostream>
 #include <assert.h>
+#include <string>
 
 
 
 void Sampler::initiate()
 {
-    m_localEnergies = new std::ofstream(m_sys->m_name + "/localEnergies.txt");
-    m_configurations = new std::ofstream(m_sys->m_name +"/configuration.txt");
-    m_metadata = new std::ofstream(m_sys->m_name +"/metadata.txt");
-    assert (m_localEnergies->is_open());
+    m_localEnergies = new std::ofstream(
+        m_sys->m_directory + "/localEnergies_" +
+        m_sys->m_thread + ".txt"
+    );
+    m_configurations = new std::ofstream(
+        m_sys->m_directory + "/configuration_"+
+        m_sys->m_thread + ".txt"
+    );
+    m_metadata = new std::ofstream(
+        m_sys->m_directory + "/metadata_" +
+        m_sys->m_thread + ".txt"
+    );
+    assert (m_metadata->is_open());
 
     m_localEnergy = 0;
     m_gradientAlpha = 0;
@@ -66,7 +76,6 @@ void Sampler::close()
     {
         (*m_metadata) << m_sys->m_acceptanceRate << "\n";
         (*m_metadata) << 2*(m_LEGA - m_localEnergy*m_gradientAlpha) << "\n";
-        std::cout << "test2" << std::endl;
     }
 
     m_localEnergies->close();

@@ -6,7 +6,8 @@ class System
 {
 public:
     //Setters
-    void setName(std::string name);
+    void setDirectory(std::string directory);
+    void setThread(std::string thread);
     void setNumParticles(int numParticles){m_numParticles = numParticles;}
     void setNumDim(int numDim){m_numDim = numDim;}
     void setStepLength(double steplength){m_stepLength = steplength;}
@@ -45,7 +46,8 @@ public:
     double acceptanceRatioImportanceSampling();
 
     double m_acceptanceRate;
-    std::string m_name;
+    std::string m_directory;
+    std::string m_thread;
 
 protected:
     int m_numParticles;
