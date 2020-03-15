@@ -1,10 +1,12 @@
 #pragma once
 #include <random>
+#include <string>
 
 class System
 {
 public:
     //Setters
+    void setName(std::string name);
     void setNumParticles(int numParticles){m_numParticles = numParticles;}
     void setNumDim(int numDim){m_numDim = numDim;}
     void setStepLength(double steplength){m_stepLength = steplength;}
@@ -41,6 +43,9 @@ public:
     double (System::*acceptanceRatio)();
     double acceptanceRatioBruteForce();
     double acceptanceRatioImportanceSampling();
+
+    double m_acceptanceRate;
+    std::string m_name;
 
 protected:
     int m_numParticles;

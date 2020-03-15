@@ -5,6 +5,7 @@
 #include "particles.hpp"
 #include "sampler.hpp"
 
+#include <string>
 #include <random>
 #include <iostream>
 #include <cmath>
@@ -85,12 +86,13 @@ void System::initiate()
 void System::runMetropolis()
 {
     bool accepted;
-    int particle, total = 0;
+    int particle;
     initiate();
     getSampler()->sample(true);
 
     step = &System::stepImportanceSampling;
     acceptanceRatio = &System::acceptanceRatioImportanceSampling;
+    m_acceptanceRate = 0;
 
     for(int i=0; i < m_metropolisSteps - 1; i++)
     {
@@ -98,20 +100,23 @@ void System::runMetropolis()
         getParticles()->proposeAdjustPos((this->*step)(particle), particle);
 
         accepted = ((this->*acceptanceRatio)() > getRandomUniform());
-
         if (accepted)
         {
             getParticles()->commitAdjustPos();
-            total += 1;
+            m_acceptanceRate += 1;
         }
 
         getSampler()->sample(accepted);
     }
+    m_acceptanceRate /= getMetropolisSteps();
 
-    std::cout << total << "/" << m_metropolisSteps << std::endl;
     getSampler()->close();
 }
 
+void System::setName(std::string name)
+{
+    m_name = name;
+}
 
 void System::setInitialState(InitialState* initState)
 {

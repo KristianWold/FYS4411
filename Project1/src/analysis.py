@@ -1,7 +1,7 @@
 import numpy as np
 import subprocess
-from numba import jit
 from tqdm import tqdm
+import os
 
 
 def smoothing(x, smoothing_window):
@@ -36,7 +36,12 @@ def thermalize_cutoff(localEnergies, smoothing_window, tol):
 
 
 def runner(conf):
-    args = ["./vmc", "numPart", "numDim",
+    try:
+        os.mkdir(conf["name"])
+    except:
+        pass
+
+    args = ["./vmc", "name", "numPart", "numDim",
             "numSteps", "stepLength", "alpha", "a", "omega"]
     for i in range(1, len(args)):
         args[i] = str(conf[args[i]])

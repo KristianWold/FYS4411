@@ -20,6 +20,8 @@ double Hardshell::correlation(double* pos1, double* pos2)
         temp = (pos1[i] - pos2[i]);
         r12 += temp*temp;
     }
+    r12 = std::sqrt(r12);
+
     if (r12 > m_a)
     {
         temp = 1 - m_a/r12;

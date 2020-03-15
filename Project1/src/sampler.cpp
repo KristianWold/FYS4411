@@ -3,13 +3,19 @@
 #include "Hamiltonians/hamiltonian.hpp"
 #include "WaveFunctions/wavefunction.hpp"
 #include "particles.hpp"
+
 #include <fstream>
+#include <iostream>
+#include <assert.h>
+
+
 
 void Sampler::initiate()
 {
-    m_localEnergies = new std::ofstream("localEnergies.txt");
-    m_configurations = new std::ofstream("configuration.txt");
-    m_metadata = new std::ofstream("metadata.txt");
+    m_localEnergies = new std::ofstream(m_sys->m_name + "/localEnergies.txt");
+    m_configurations = new std::ofstream(m_sys->m_name +"/configuration.txt");
+    m_metadata = new std::ofstream(m_sys->m_name +"/metadata.txt");
+    assert (m_localEnergies->is_open());
 
     m_localEnergy = 0;
     m_gradientAlpha = 0;
@@ -58,7 +64,9 @@ void Sampler::close()
 
     if (m_metadata->is_open())
     {
-        (*m_metadata) << 2*(m_LEGA - m_localEnergy*m_gradientAlpha);
+        (*m_metadata) << m_sys->m_acceptanceRate << "\n";
+        (*m_metadata) << 2*(m_LEGA - m_localEnergy*m_gradientAlpha) << "\n";
+        std::cout << "test2" << std::endl;
     }
 
     m_localEnergies->close();

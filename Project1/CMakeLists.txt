@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+set (CMAKE_CXX_STANDARD 11)
 project(project_1_FYS4411)
 
 # Add directories containing header-files
