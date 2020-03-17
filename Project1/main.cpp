@@ -13,33 +13,89 @@
 #include <iostream>
 #include <string>
 
-int main(int argc, char const *argv[]){
+void initiateSystemObjects(
+    InitialState* &initialstate,
+    WaveFunction* &wavefunction,
+    Hamiltonian* &hamiltonian,
+    char const *argv[])
+{
+    double alpha = atof(argv[8]);
+    double a = atof(argv[9]);
+    double omega = atof(argv[10]);
 
+    switch(atoi(argv[11]))
+    {
+        case 1:
+            initialstate = new RandomUniform();
+            break;
+        case 2:
+            initialstate = new InitialHardshell();
+            break;
+        default:
+            std::cout << "ost1" << std::endl;
+    }
+
+    switch(atoi(argv[12]))
+    {
+        case 1:
+            wavefunction = new SimpleGaussian(alpha);
+            break;
+        case 2:
+            wavefunction = new SimpleGaussianNumerical(alpha, 1e-4);
+            break;
+        case 3:
+            wavefunction = new Hardshell(alpha, a);
+            break;
+        default:
+            std::cout << "ost2" << std::endl;
+    }
+
+    switch(atoi(argv[13]))
+    {
+        case 1:
+            hamiltonian = new HarmonicOscillator(omega);
+            break;
+        default:
+            std::cout << "ost3" << std::endl;
+    }
+}
+
+int main(int argc, char const *argv[])
+{
     std::string directory = argv[1];
     std::string thread = argv[2];
     int numPart = atoi(argv[3]);
     int numDim = atoi(argv[4]);
     int numSteps = atoi(argv[5]);
     double stepLength = atof(argv[6]);
-    double alpha = atof(argv[7]);
-    double a = atof(argv[8]);
-    double omega = atof(argv[9]);
+    int importanceSampling = atoi(argv[7]);
+
+    InitialState* initialState;
+    WaveFunction* wavefunction;
+    Hamiltonian* hamiltonian;
+
+    initiateSystemObjects(
+        initialState,
+        wavefunction,
+        hamiltonian,
+        argv
+    );
 
     System* sys = new System();
-
     sys->setDirectory(directory);
     sys->setThread(thread);
 
-    sys->setStepLength(stepLength);
     sys->setNumParticles(numPart);
     sys->setNumDim(numDim);
-
-    sys->setInitialState(new InitialHardshell());
-    sys->setWaveFunction(new Hardshell(alpha, a));
-    sys->setHamiltonian(new HarmonicOscillator(omega));
-    sys->setSampler(new Sampler());
     sys->setMetropolisSteps(numSteps);
+    sys->setStepLength(stepLength);
+    sys->setImportanceSampling(importanceSampling);
     sys->setSeed(42 + atoi(argv[2]) - 1);
+
+    sys->setInitialState(initialState);
+    sys->setWaveFunction(wavefunction);
+    sys->setHamiltonian(hamiltonian);
+    sys->setSampler(new Sampler());
 
     sys->runMetropolis();
     return 0;

@@ -11,7 +11,7 @@ Hardshell::Hardshell(double alpha, double a)
     m_a = a;
 }
 
-double Hardshell::correlation(double* pos1, double* pos2)
+double Hardshell::distance(double* pos1, double* pos2)
 {
     double r12 = 0;
     double temp;
@@ -21,7 +21,13 @@ double Hardshell::correlation(double* pos1, double* pos2)
         r12 += temp*temp;
     }
     r12 = std::sqrt(r12);
+    return r12;
+}
 
+double Hardshell::correlation(double* pos1, double* pos2)
+{
+    double temp;
+    double r12 = distance(pos1, pos2);
     if (r12 > m_a)
     {
         temp = 1 - m_a/r12;
@@ -130,13 +136,40 @@ double Hardshell::gradAlpha()
 }
 
 
-void Hardshell::initiate(){};
-
-
 void Hardshell::gradient(double* gradient, int particle, double* position)
 {
-    for (int i = 0; i < m_sys->getNumDim(); i++)
+
+    double pos1, pos2, temp, r12 = 0;
+    Particles* particles = m_sys->getParticles();
+    int numPart = m_sys->getNumParticles();
+    int numDim = m_sys->getNumDim();
+    for (int j = 0; j < numDim; j++)
     {
-        gradient[i] = -2*m_alpha*position[i];
+        m_temp[j] = 0;
+    }
+
+    for (int i = 0; i < numPart; i++)
+    {
+        if (i != particle)
+        {
+            r12 = distance(position, particles->position(i));
+            temp = m_a/(r12*r12*(r12 - m_a));
+
+            for (int j = 0; j < numDim; j++)
+            {
+                m_temp[j] += (position[j] - particles->position(i,j))*temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < numDim; i++)
+    {
+        gradient[i] = (temp - 2*m_alpha)*position[i];
     }
 }
+
+
+void Hardshell::initiate()
+{
+    m_temp = new double[m_sys->getNumDim()];
+};

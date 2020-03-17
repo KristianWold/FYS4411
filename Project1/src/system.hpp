@@ -6,12 +6,14 @@ class System
 {
 public:
     //Setters
-    void setDirectory(std::string directory);
-    void setThread(std::string thread);
+    void setDirectory(std::string directory){m_directory = directory;}
+    void setThread(std::string thread){m_thread = thread;}
     void setNumParticles(int numParticles){m_numParticles = numParticles;}
     void setNumDim(int numDim){m_numDim = numDim;}
-    void setStepLength(double steplength){m_stepLength = steplength;}
     void setMetropolisSteps(int metropolisSteps){m_metropolisSteps = metropolisSteps;}
+    void setStepLength(double steplength){m_stepLength = steplength;}
+    void setImportanceSampling(int importanceSampling);
+    void setSeed(int seed);
 
     void setInitialState(class InitialState* initState);
     void setHamiltonian(class Hamiltonian* hamiltonian);
@@ -19,7 +21,7 @@ public:
     void setParticles(class Particles* particles);
     void setSampler(class Sampler* sampler);
 
-    void setSeed(int seed);
+
 
     //Getters
     int getNumParticles(){return m_numParticles;}

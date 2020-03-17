@@ -37,22 +37,74 @@ def thermalize_cutoff(localEnergies, smoothing_window, tol):
     return cutoff
 
 
-def runner(conf, threads=1):
+def setupDictionaries():
+    # Default values if the config is undefined
+    default = {}
+    default["directory"] = "data"
+    default["threads"] = 1
+    default["numPart"] = 1
+    default["numDim"] = 1
+    default["numSteps"] = 1000
+    default["stepLength"] = 1
+    default["importanceSampling"] = 0
+    default["alpha"] = 0.5
+    default["a"] = 1
+    default["omega"] = 1
+    default["InitialState"] = "RandomUniform"
+    default["Wavefunction"] = "SimpleGaussian"
+    default["Hamiltonian"] = "HarmonicOscillator"
 
-    dir = conf["directory"]
+    # Maps system object types to numbers for the executable to interpret
+    mapper = {}
+    mapper["RandomUniform"] = "1"
+    mapper["HardshellInitial"] = "2"
+
+    mapper["SimpleGaussian"] = "1"
+    mapper["SimpleGaussianNumerical"] = "2"
+    mapper["HardshellWavefunction"] = "3"
+
+    mapper["HarmonicOscillator"] = "1"
+
+    # Arguments expected by the executable
+    params = ["numPart", "numDim", "numSteps", "stepLength", "importanceSampling",
+              "alpha", "a", "omega",
+              "InitialState", "Wavefunction", "Hamiltonian"]
+
+    return default, mapper, params
+
+
+def runner(conf):
+
+    default, mapper, params = setupDictionaries()
+
+    dir = conf.get("directory", default["directory"])
     if os.path.exists(dir):
         shutil.rmtree(dir)
     os.mkdir(dir)
 
-    params = ["numPart", "numDim", "numSteps",
-              "stepLength", "alpha", "a", "omega"]
-
     for i in range(len(params)):
-        params[i] = str(conf[params[i]])
+        params[i] = str(conf.get(params[i], default[params[i]]))
 
     args = []
-    for i in range(threads):
-        args.append(["./vmc", conf["directory"], str(i)] + params)
+    numThreads = conf.get("threads", default["threads"])
+    for i in range(numThreads):
+        args.append(
+            ["./vmc", conf.get("directory", default["directory"]), str(i)]
+            + params[:8] + [mapper[i] for i in params[8:]]
+        )
+
+    print(f"Starting simulation")
+    print(f"numPart: {params[0]}")
+    print(f"numDim: {params[1]}")
+    print(f"numSteps: {params[2]}")
+    print(f"stepLength: {params[3]}")
+    print(f"importanceSampling: {params[4]}")
+    print(f"alpha: {params[5]}")
+    print(f"a: {params[6]}")
+    print(f"omega: {params[7]}")
+    print(f"InitialState: {params[8]}")
+    print(f"WaveFunction: {params[9]}")
+    print(f"Hamiltonian: {params[10]}")
 
     processes = []
     for a in args:

@@ -90,10 +90,6 @@ void System::runMetropolis()
     initiate();
     getSampler()->sample(true);
 
-    //step = &System::stepBruteForce;
-    //acceptanceRatio = &System::acceptanceRatioBruteForce;
-    step = &System::stepImportanceSampling;
-    acceptanceRatio = &System::acceptanceRatioImportanceSampling;
     m_acceptanceRate = 0;
 
     for(int i=0; i < m_metropolisSteps - 1; i++)
@@ -102,13 +98,13 @@ void System::runMetropolis()
         getParticles()->proposeAdjustPos((this->*step)(particle), particle);
 
         accepted = ((this->*acceptanceRatio)() > getRandomUniform());
-        //std::cout << getRandomUniform() << std::endl;
+
         if (accepted)
         {
             getParticles()->commitAdjustPos();
             m_acceptanceRate += 1;
         }
-        //std::cout << getHamiltonian()->localEnergy() << std::endl;
+
         getSampler()->sample(accepted);
     }
     m_acceptanceRate /= getMetropolisSteps();
@@ -116,15 +112,21 @@ void System::runMetropolis()
     getSampler()->close();
 }
 
-void System::setDirectory(std::string directory)
+
+void System::setImportanceSampling(int importanceSampling)
 {
-    m_directory = directory;
+    if (importanceSampling == 1)
+    {
+        step = &System::stepImportanceSampling;
+        acceptanceRatio = &System::acceptanceRatioImportanceSampling;
+    }
+    else
+    {
+        step = &System::stepBruteForce;
+        acceptanceRatio = &System::acceptanceRatioBruteForce;
+    }
 }
 
-void System::setThread(std::string thread)
-{
-    m_thread = thread;
-}
 
 void System::setInitialState(InitialState* initState)
 {
