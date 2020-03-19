@@ -80,7 +80,7 @@ def config():
     return default
 
 
-def runner(conf):
+def runner(conf, verbose=False):
 
     mapper, params = setupDictionaries()
 
@@ -100,18 +100,19 @@ def runner(conf):
             + params[:8] + [mapper[i] for i in params[8:]]
         )
 
-    print(f"Starting simulation")
-    print(f"numPart: {params[0]}")
-    print(f"numDim: {params[1]}")
-    print(f"numSteps: {params[2]}")
-    print(f"stepLength: {params[3]}")
-    print(f"importanceSampling: {params[4]}")
-    print(f"alpha: {params[5]}")
-    print(f"a: {params[6]}")
-    print(f"omega: {params[7]}")
-    print(f"InitialState: {params[8]}")
-    print(f"WaveFunction: {params[9]}")
-    print(f"Hamiltonian: {params[10]}")
+    if verbose:
+        print(f"Starting simulation")
+        print(f"numPart: {params[0]}")
+        print(f"numDim: {params[1]}")
+        print(f"numSteps: {params[2]}")
+        print(f"stepLength: {params[3]}")
+        print(f"importanceSampling: {params[4]}")
+        print(f"alpha: {params[5]}")
+        print(f"a: {params[6]}")
+        print(f"omega: {params[7]}")
+        print(f"InitialState: {params[8]}")
+        print(f"WaveFunction: {params[9]}")
+        print(f"Hamiltonian: {params[10]}")
 
     processes = []
     for a in args:
@@ -120,6 +121,10 @@ def runner(conf):
 
     for process in processes:
         assert (process.wait() == 0)
+
+    if verbose:
+        print("Done!")
+        print("------------")
 
 
 def readData(conf, cutoff=0):
@@ -176,7 +181,7 @@ def oneBodyDensity(pos, bins, mode="radial"):
             except:
                 pass
 
-        return count / pos.shape[0]
+        return count / (pos.shape[0] * dx)
 
     if mode == "2D":
         count = np.zeros((bins.shape[0], bins.shape[0]))
@@ -191,6 +196,9 @@ def oneBodyDensity(pos, bins, mode="radial"):
         return count / pos.shape[0]
 
 
-def blocking(x):
-    x_blocked = [np.mean(i) for i in x.reshape(-1, 2)]
-    return np.array(x_blocked)
+def blocking(x, degree=1):
+    estimatedVar = [np.std(x)**2 / len(x)]
+    for i in range(degree):
+        x = np.array([np.mean(i) for i in x.reshape(-1, 2)])
+        estimatedVar.append(np.std(x)**2 / len(x))
+    return estimatedVar
