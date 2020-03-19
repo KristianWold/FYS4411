@@ -6,10 +6,12 @@
 #include "src/InitialStates/initialhardshell.hpp"
 #include "src/Hamiltonians/hamiltonian.hpp"
 #include "src/Hamiltonians/harmonicoscillator.hpp"
+#include "src/Hamiltonians/ellipticaloscillator.hpp"
 #include "src/WaveFunctions/wavefunction.hpp"
 #include "src/WaveFunctions/simplegaussian.hpp"
 #include "src/WaveFunctions/simplegaussiannumerical.hpp"
 #include "src/WaveFunctions/hardshell.hpp"
+#include "src/WaveFunctions/ellipticalhardshell.hpp"
 #include <iostream>
 #include <string>
 
@@ -46,6 +48,9 @@ void initiateSystemObjects(
         case 3:
             wavefunction = new Hardshell(alpha, a);
             break;
+        case 4:
+            wavefunction = new EllipticalHardshell(alpha, a, 2.82843);
+            break;
         default:
             std::cout << "ost2" << std::endl;
     }
@@ -54,6 +59,9 @@ void initiateSystemObjects(
     {
         case 1:
             hamiltonian = new HarmonicOscillator(omega);
+            break;
+        case 2:
+            hamiltonian = new EllipticalOscillator(2.82843);
             break;
         default:
             std::cout << "ost3" << std::endl;

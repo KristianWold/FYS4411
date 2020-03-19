@@ -4,6 +4,7 @@ from tqdm import tqdm
 import os
 import shutil
 import multiprocessing
+import pandas as pd
 
 
 def smoothing(x, smoothing_window):
@@ -38,7 +39,30 @@ def thermalize_cutoff(localEnergies, smoothing_window, tol):
 
 
 def setupDictionaries():
-    # Default values if the config is undefined
+
+    # Maps system object types to numbers for the executable to interpret
+    mapper = {}
+    mapper["RandomUniform"] = "1"
+    mapper["HardshellInitial"] = "2"
+
+    mapper["SimpleGaussian"] = "1"
+    mapper["SimpleGaussianNumerical"] = "2"
+    mapper["HardshellWavefunction"] = "3"
+    mapper["EllipticalHardshellWavefunction"] = "4"
+
+    mapper["HarmonicOscillator"] = "1"
+    mapper["EllipticalOscillator"] = "2"
+
+    # Arguments expected by the executable
+    params = ["numPart", "numDim", "numSteps", "stepLength", "importanceSampling",
+              "alpha", "a", "omega",
+              "InitialState", "Wavefunction", "Hamiltonian"]
+
+    return mapper, params
+
+
+def config():
+    # Default values
     default = {}
     default["directory"] = "data"
     default["threads"] = 1
@@ -53,43 +77,26 @@ def setupDictionaries():
     default["InitialState"] = "RandomUniform"
     default["Wavefunction"] = "SimpleGaussian"
     default["Hamiltonian"] = "HarmonicOscillator"
-
-    # Maps system object types to numbers for the executable to interpret
-    mapper = {}
-    mapper["RandomUniform"] = "1"
-    mapper["HardshellInitial"] = "2"
-
-    mapper["SimpleGaussian"] = "1"
-    mapper["SimpleGaussianNumerical"] = "2"
-    mapper["HardshellWavefunction"] = "3"
-
-    mapper["HarmonicOscillator"] = "1"
-
-    # Arguments expected by the executable
-    params = ["numPart", "numDim", "numSteps", "stepLength", "importanceSampling",
-              "alpha", "a", "omega",
-              "InitialState", "Wavefunction", "Hamiltonian"]
-
-    return default, mapper, params
+    return default
 
 
 def runner(conf):
 
-    default, mapper, params = setupDictionaries()
+    mapper, params = setupDictionaries()
 
-    dir = conf.get("directory", default["directory"])
+    dir = conf["directory"]
     if os.path.exists(dir):
         shutil.rmtree(dir)
     os.mkdir(dir)
 
     for i in range(len(params)):
-        params[i] = str(conf.get(params[i], default[params[i]]))
+        params[i] = str(conf[params[i]])
 
     args = []
-    numThreads = conf.get("threads", default["threads"])
+    numThreads = conf["threads"]
     for i in range(numThreads):
         args.append(
-            ["./vmc", conf.get("directory", default["directory"]), str(i)]
+            ["./vmc", conf["directory"], str(i)]
             + params[:8] + [mapper[i] for i in params[8:]]
         )
 
@@ -115,13 +122,39 @@ def runner(conf):
         assert (process.wait() == 0)
 
 
-def statistics(localEnergies):
+def readData(conf, cutoff=0):
+    localEnergies = []
+    pos = []
+    gradient = 0
+    acceptanceRate = 0
+    for i in range(conf["threads"]):
 
-    cutoff = thermalize_cutoff(localEnergies, 10000, 0.001)
-    meanE = np.mean(localEnergies[cutoff:])
-    varE = np.var(localEnergies[cutoff:])
+        localEnergies_temp = pd.read_csv(
+            f"{conf['directory']}/localEnergies_{i}.txt", sep="\n", header=None
+        ).values
+        localEnergies.append(localEnergies_temp[cutoff:])
 
-    return meanE, varE
+        pos_temp = pd.read_csv(
+            f"{conf['directory']}/configuration_{i}.txt", sep="\n", header=None
+        ).values
+        pos.append(pos_temp.reshape(-1, conf["numDim"])[cutoff:])
+
+        gradient_temp = pd.read_csv(
+            f"{conf['directory']}/gradient_{i}.txt", sep="\n", header=None
+        ).values
+
+        gradient += 2 * np.mean(localEnergies[i] * gradient_temp)
+        gradient += -2 * np.mean(localEnergies[i]) * np.mean(gradient_temp)
+
+        acceptanceRate_temp = pd.read_csv(
+            f"{conf['directory']}/metadata_{i}.txt", sep="\n", header=None
+        ).values
+        acceptanceRate += acceptanceRate_temp[0]
+
+    gradient /= conf["threads"]
+    acceptanceRate /= conf["threads"]
+
+    return localEnergies, pos, gradient, acceptanceRate
 
 
 def oneBodyDensity(pos, bins, mode="radial"):

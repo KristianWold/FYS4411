@@ -21,15 +21,15 @@ void Sampler::initiate()
         m_sys->m_directory + "/configuration_"+
         m_sys->m_thread + ".txt"
     );
+    m_gradient = new std::ofstream(
+        m_sys->m_directory + "/gradient_" +
+        m_sys->m_thread + ".txt"
+    );
     m_metadata = new std::ofstream(
         m_sys->m_directory + "/metadata_" +
         m_sys->m_thread + ".txt"
     );
     assert (m_metadata->is_open());
-
-    m_localEnergy = 0;
-    m_gradientAlpha = 0;
-    m_LEGA = 0;
 }
 
 
@@ -39,12 +39,7 @@ void Sampler::sample(bool accepted)
     {
         m_localEnergyOld = m_sys->getHamiltonian()->localEnergy();
         m_gradientAlphaOld = m_sys->getWavefunction()->gradAlpha();
-        m_LEGAOld = m_localEnergyOld*m_gradientAlphaOld;
     }
-
-    m_localEnergy += m_localEnergyOld;
-    m_gradientAlpha += m_gradientAlphaOld;
-    m_LEGA += m_LEGAOld;
 
     if (m_localEnergies->is_open())
     {
@@ -63,22 +58,24 @@ void Sampler::sample(bool accepted)
             }
         }
     }
+
+    if (m_gradient->is_open())
+    {
+        (*m_gradient) << m_gradientAlphaOld << "\n";
+    }
 }
 
 
 void Sampler::close()
 {
-    m_localEnergy /= m_sys->getMetropolisSteps();
-    m_gradientAlpha /= m_sys->getMetropolisSteps();
-    m_LEGA /= m_sys->getMetropolisSteps();
-
     if (m_metadata->is_open())
     {
         (*m_metadata) << m_sys->m_acceptanceRate << "\n";
-        (*m_metadata) << 2*(m_LEGA - m_localEnergy*m_gradientAlpha) << "\n";
     }
 
     m_localEnergies->close();
     m_configurations->close();
+    m_gradient->close();
     m_metadata->close();
+    
 };

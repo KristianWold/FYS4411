@@ -1,17 +1,18 @@
 #include "../Hamiltonians/harmonicoscillator.hpp"
 #include "../system.hpp"
 #include "../particles.hpp"
-#include "hardshell.hpp"
+#include "ellipticalhardshell.hpp"
 #include <cmath>
 #include <iostream>
 
-Hardshell::Hardshell(double alpha, double a)
+EllipticalHardshell::EllipticalHardshell(double alpha, double a, double beta)
 {
     m_alpha = alpha;
     m_a = a;
+    m_beta = beta;
 }
 
-double Hardshell::distance(double* pos1, double* pos2)
+double EllipticalHardshell::distance(double* pos1, double* pos2)
 {
     double r12 = 0;
     double temp;
@@ -24,7 +25,7 @@ double Hardshell::distance(double* pos1, double* pos2)
     return r12;
 }
 
-double Hardshell::correlation(double* pos1, double* pos2)
+double EllipticalHardshell::correlation(double* pos1, double* pos2)
 {
     double temp;
     double r12 = distance(pos1, pos2);
@@ -40,17 +41,16 @@ double Hardshell::correlation(double* pos1, double* pos2)
     return temp;
 }
 
-double Hardshell::oneBodyExponent(double* pos)
+double EllipticalHardshell::oneBodyExponent(double* pos)
 {
     double expo = 0;
-    for(int i = 0; i < m_sys->getNumDim(); i++)
-    {
-        expo += pos[i]*pos[i];
-    }
+    expo += pos[0]*pos[0];
+    expo += pos[1]*pos[1];
+    expo += m_beta*pos[2]*pos[2];
     return expo;
 }
 
-double Hardshell::evaluate()
+double EllipticalHardshell::evaluate()
 {
     double expo = 0;
     double corr = 1;
@@ -70,7 +70,7 @@ double Hardshell::evaluate()
     return std::exp(-m_alpha*expo)*corr;
 }
 
-double Hardshell::amplitudeRatio()
+double EllipticalHardshell::amplitudeRatio()
 {
     double expo = 0;
     double corr = 1;
@@ -96,7 +96,7 @@ double Hardshell::amplitudeRatio()
     return std::exp(-2*m_alpha*expo)*corr*corr;
 }
 
-double Hardshell::laplacian()
+double EllipticalHardshell::laplacian()
 {
     int numPart = m_sys->getNumParticles();
     int numDim = m_sys->getNumDim();
@@ -114,7 +114,6 @@ double Hardshell::laplacian()
         for (int k = 0; k < numDim; k++)
         {
             temp[k] = 0;
-            temp1 += pos1[k]*pos1[k];
         }
 
         for (int j = 0; j < numPart; j++)
@@ -141,14 +140,13 @@ double Hardshell::laplacian()
         }
         temp3 *= 2;
 
-        lap += m_alpha*(4*m_alpha*temp1 - 2*numDim) + temp2 + temp3 + temp4;
+        lap += m_alpha*(4*m_alpha*oneBodyExponent(pos1) - 2*numDim) + temp2 + temp3 + temp4;
     }
-
     return lap;
 }
 
 
-double Hardshell::gradAlpha()
+double EllipticalHardshell::gradAlpha()
 {
     double temp = 0;
     double pos = 0;
@@ -158,18 +156,14 @@ double Hardshell::gradAlpha()
 
     for(int i = 0; i < numPart; i++)
     {
-        for (int j = 0; j < numDim; j++)
-        {
-            pos = particles->position(i, j);
-            temp += pos*pos;
-        }
+        temp += oneBodyExponent(particles->position(i));
 
     }
     return -temp;
 }
 
 
-void Hardshell::gradient(double* gradient, int particle, double* position)
+void EllipticalHardshell::gradient(double* gradient, int particle, double* position)
 {
 
     double pos1, pos2, temp, r12 = 0;
@@ -195,14 +189,13 @@ void Hardshell::gradient(double* gradient, int particle, double* position)
         }
     }
 
-    for (int i = 0; i < numDim; i++)
-    {
-        gradient[i] = (m_temp[i] - 2*m_alpha)*position[i];
-    }
+    gradient[0] = (m_temp[0] - 2*m_alpha)*position[0];
+    gradient[1] = (m_temp[1] - 2*m_alpha)*position[1];
+    gradient[2] = (m_temp[0] - 2*m_alpha*m_beta)*position[2];
 }
 
 
-void Hardshell::initiate()
+void EllipticalHardshell::initiate()
 {
     m_temp = new double[m_sys->getNumDim()];
 

@@ -2,10 +2,10 @@
 #include "wavefunction.hpp"
 
 
-class Hardshell : public WaveFunction
+class EllipticalHardshell : public WaveFunction
 {
 public:
-    Hardshell(double alpha, double a);
+    EllipticalHardshell(double alpha, double a, double beta);
     double laplacian();
     double evaluate();
     double amplitudeRatio();
@@ -21,6 +21,7 @@ public:
 private:
     double m_alpha;
     double m_a;
+    double m_beta;
     double* m_temp;
 
     double** m_r12;
