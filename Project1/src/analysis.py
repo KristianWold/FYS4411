@@ -181,7 +181,7 @@ def oneBodyDensity(pos, bins, mode="radial"):
             except:
                 pass
 
-        return count / (pos.shape[0] * dx)
+        return count / dx
 
     if mode == "2D":
         count = np.zeros((bins.shape[0], bins.shape[0]))
