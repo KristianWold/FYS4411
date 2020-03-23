@@ -130,7 +130,7 @@ def runner(conf, verbose=False):
 def readData(conf, cutoff=0):
     localEnergies = []
     pos = []
-    gradient = 0
+    gradient = []
     acceptanceRate = 0
     for i in range(conf["threads"]):
 
@@ -147,16 +147,13 @@ def readData(conf, cutoff=0):
         gradient_temp = pd.read_csv(
             f"{conf['directory']}/gradient_{i}.txt", sep="\n", header=None
         ).values
-
-        gradient += 2 * np.mean(localEnergies[i] * gradient_temp)
-        gradient += -2 * np.mean(localEnergies[i]) * np.mean(gradient_temp)
+        gradient.append(gradient_temp)
 
         acceptanceRate_temp = pd.read_csv(
             f"{conf['directory']}/metadata_{i}.txt", sep="\n", header=None
         ).values
         acceptanceRate += acceptanceRate_temp[0]
 
-    gradient /= conf["threads"]
     acceptanceRate /= conf["threads"]
 
     return localEnergies, pos, gradient, acceptanceRate
@@ -165,11 +162,17 @@ def readData(conf, cutoff=0):
 def oneBodyDensity(pos, bins, mode="radial"):
 
     if mode == "radial":
-        r = np.linalg.norm(pos, axis=2)
-        ting = (bins[:-1, None, None] < r) & (r < bins[1:, None, None])
-        print(ting.shape)
-        count = np.sum(ting, axis=(1, 2)) / pos.shape[0]
-        return count
+        count = np.zeros(bins.shape[0])
+        r_min = bins[0]
+        dr = bins[1] - bins[0]
+        rPos = np.linalg.norm(pos, axis=1)
+        for r in tqdm(rPos):
+            try:
+                count[int((r - r_min) // dr)] += 1
+            except:
+                pass
+
+        return count / dr
 
     if mode == "1D":
         count = np.zeros(bins.shape[0])
@@ -202,3 +205,14 @@ def blocking(x, degree=1):
         x = np.array([np.mean(i) for i in x.reshape(-1, 2)])
         estimatedVar.append(np.std(x)**2 / len(x))
     return estimatedVar
+
+
+def calculateGradient(localEnergies, psiGrad, cutoff=0):
+    grad = 0
+    for i in range(len(localEnergies)):
+        LE = localEnergies[i][cutoff:]
+        G = psiGrad[i][cutoff:]
+        grad += 2 * (np.mean(LE * G) - np.mean(LE) * np.mean(G))
+
+    grad /= len(localEnergies)
+    return grad

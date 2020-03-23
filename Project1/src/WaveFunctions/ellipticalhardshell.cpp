@@ -139,8 +139,11 @@ double EllipticalHardshell::laplacian()
             temp4 += temp[k]*temp[k];
         }
         temp3 *= 2;
+        temp1 += pos1[0]*pos1[0];
+        temp1 += pos1[1]*pos1[1];
+        temp1 += m_beta*m_beta*pos1[2]*pos1[2];
 
-        lap += m_alpha*(4*m_alpha*oneBodyExponent(pos1) - 2*numDim) + temp2 + temp3 + temp4;
+        lap += m_alpha*(4*m_alpha*temp1 - 2*(2 + m_beta)) + temp2 + temp3 + temp4;
     }
     return lap;
 }
@@ -156,10 +159,9 @@ double EllipticalHardshell::gradAlpha()
 
     for(int i = 0; i < numPart; i++)
     {
-        temp += oneBodyExponent(particles->position(i));
-
+        temp -= oneBodyExponent(particles->position(i));
     }
-    return -temp;
+    return temp;
 }
 
 
@@ -191,7 +193,7 @@ void EllipticalHardshell::gradient(double* gradient, int particle, double* posit
 
     gradient[0] = (m_temp[0] - 2*m_alpha)*position[0];
     gradient[1] = (m_temp[1] - 2*m_alpha)*position[1];
-    gradient[2] = (m_temp[0] - 2*m_alpha*m_beta)*position[2];
+    gradient[2] = (m_temp[2] - 2*m_alpha*m_beta)*position[2];
 }
 
 
