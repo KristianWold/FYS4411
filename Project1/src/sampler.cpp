@@ -53,6 +53,7 @@ void Sampler::sample(bool accepted)
             for (int j = 0; j < m_sys->getNumDim(); j++)
             {
                 (*m_configurations) <<
+                std::setprecision(3) <<
                 m_sys->getParticles()->position(i,j)
                                     << "\n";
             }
@@ -77,5 +78,5 @@ void Sampler::close()
     m_configurations->close();
     m_gradient->close();
     m_metadata->close();
-    
+
 };

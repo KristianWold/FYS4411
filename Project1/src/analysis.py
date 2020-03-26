@@ -3,7 +3,7 @@ import subprocess
 from tqdm import tqdm
 import os
 import shutil
-import multiprocessing
+from multiprocessing import Process, Queue
 import pandas as pd
 
 
@@ -127,7 +127,7 @@ def runner(conf, verbose=False):
         print("------------")
 
 
-def readData(conf, cutoff=0):
+def readData(conf, cutoff=0, readPos=True):
     localEnergies = []
     pos = []
     gradient = []
@@ -139,15 +139,16 @@ def readData(conf, cutoff=0):
         ).values
         localEnergies.append(localEnergies_temp[cutoff:])
 
-        pos_temp = pd.read_csv(
-            f"{conf['directory']}/configuration_{i}.txt", sep="\n", header=None
-        ).values
-        pos.append(pos_temp.reshape(-1, conf["numDim"])[cutoff:])
+        if readPos:
+            pos_temp = pd.read_csv(
+                f"{conf['directory']}/configuration_{i}.txt", sep="\n",
+                header=None).values
+            pos.append(pos_temp.reshape(-1, conf["numDim"])[cutoff:])
 
         gradient_temp = pd.read_csv(
             f"{conf['directory']}/gradient_{i}.txt", sep="\n", header=None
         ).values
-        gradient.append(gradient_temp)
+        gradient.append(gradient_temp[cutoff:])
 
         acceptanceRate_temp = pd.read_csv(
             f"{conf['directory']}/metadata_{i}.txt", sep="\n", header=None
@@ -162,29 +163,29 @@ def readData(conf, cutoff=0):
 def oneBodyDensity(pos, bins, mode="radial"):
 
     if mode == "radial":
-        count = np.zeros(bins.shape[0])
+        density = np.zeros(bins.shape[0])
         r_min = bins[0]
         dr = bins[1] - bins[0]
         rPos = np.linalg.norm(pos, axis=1)
         for r in tqdm(rPos):
             try:
-                count[int((r - r_min) // dr)] += 1
+                density[int((r - r_min) // dr)] += 1
             except:
                 pass
 
-        return count / dr
+        return density / dr
 
     if mode == "1D":
-        count = np.zeros(bins.shape[0])
+        density = np.zeros(bins.shape[0])
         x_min = bins[0]
         dx = bins[1] - bins[0]
         for x in tqdm(pos):
             try:
-                count[int((x - x_min) // dx)] += 1
+                density[int((x - x_min) // dx)] += 1
             except:
                 pass
 
-        return count / dx
+        return density / dx
 
     if mode == "2D":
         count = np.zeros((bins.shape[0], bins.shape[0]))
@@ -192,26 +193,50 @@ def oneBodyDensity(pos, bins, mode="radial"):
         dy = dx = bins[1] - bins[0]
         for x, y in tqdm(pos):
             try:
-                count[int((x - x_min) // dx), int((y - y_min) // dy)] += 1
+                density[int((x - x_min) // dx), int((y - y_min) // dy)] += 1
             except:
                 pass
 
-        return count / pos.shape[0]
+        return density / pos.shape[0]
+
+
+def densityParallel(conf, bins, mode="radial"):
+
+    def f(q, i):
+        pos = pd.read_csv(conf["directory"] + f"/configuration_{i}.txt",
+                          sep="\n", header=None).values.reshape(-1, conf["numDim"])
+        density = oneBodyDensity(pos, bins, mode=mode)
+        q.put(density)
+
+    q = Queue()
+    processes = [Process(target=f, args=(q, i))
+                 for i in range(conf["threads"])]
+
+    for p in processes:
+        p.start()
+
+    density = q.get()
+    for i in range(conf["threads"] - 1):
+        density += q.get()
+
+    density /= conf["threads"]
+
+    return density
 
 
 def blocking(x, degree=1):
     estimatedVar = [np.std(x)**2 / len(x)]
-    for i in range(degree):
+    for i in tqdm(range(degree)):
         x = np.array([np.mean(i) for i in x.reshape(-1, 2)])
         estimatedVar.append(np.std(x)**2 / len(x))
     return estimatedVar
 
 
-def calculateGradient(localEnergies, psiGrad, cutoff=0):
+def calculateGradient(localEnergies, psiGrad):
     grad = 0
     for i in range(len(localEnergies)):
-        LE = localEnergies[i][cutoff:]
-        G = psiGrad[i][cutoff:]
+        LE = localEnergies[i]
+        G = psiGrad[i]
         grad += 2 * (np.mean(LE * G) - np.mean(LE) * np.mean(G))
 
     grad /= len(localEnergies)
