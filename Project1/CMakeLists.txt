@@ -24,18 +24,18 @@ add_executable(vmc ${SOURCES})
 
 
 # Testing
-add_subdirectory(./googletest)
+#add_subdirectory(./googletest)
 
 # Add sources from all directories
-file(
-    GLOB TESTSOURCES "test.cpp"
-    GLOB TESTSOURCES "src/*.cpp"
-    GLOB TESTSOURCES "src/InitialStates/*.cpp"
-    GLOB TESTSOURCES "src/Hamiltonians/*.cpp"
-    GLOB TESTSOURCES "src/WaveFunctions/*.cpp"
+#file(
+#    GLOB TESTSOURCES "test.cpp"
+#    GLOB TESTSOURCES "src/*.cpp"
+#    GLOB TESTSOURCES "src/InitialStates/*.cpp"
+#    GLOB TESTSOURCES "src/Hamiltonians/*.cpp"
+#    GLOB TESTSOURCES "src/WaveFunctions/*.cpp"
 
-)
+#)
 
-add_executable(runUnitTests ${TESTSOURCES})
+#add_executable(runUnitTests ${TESTSOURCES})
 
-target_link_libraries(runUnitTests gtest gtest_main)
+#target_link_libraries(runUnitTests gtest gtest_main)
