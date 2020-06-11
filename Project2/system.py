@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from tqdm.notebook import tqdm
 
 
 class System():
@@ -62,7 +63,8 @@ class HarmonicOsc():
         self.omega = omega
 
     def __call__(self, x):
-        V = 0.5 * self.omega * tf.reshape(tf.reduce_sum(x**2, axis=1), (-1, 1))
+        V = 0.5 * self.omega**2 * \
+            tf.reshape(tf.reduce_sum(x**2, axis=1), (-1, 1))
         return V
 
 
@@ -81,3 +83,45 @@ class Coulomb():
                 V += self.alpha / tf.math.sqrt(r12**2 + self.shield_const**2)
 
         return V
+
+
+def oneBodyDensity(pos, bins, mode="radial"):
+
+    if mode == "radial1D":
+        density = np.zeros(bins.shape[0])
+        r_min = bins[0]
+        dr = bins[1] - bins[0]
+        rPos = np.linalg.norm(pos, axis=1)
+        for r in tqdm(rPos):
+            try:
+                density[int((r - r_min) // dr)] += 1 / dr
+            except:
+                pass
+
+        return density
+
+    if mode == "radial2D":
+        density = np.zeros(bins.shape[0])
+        r_min = bins[0]
+        dr = bins[1] - bins[0]
+        rPos = np.linalg.norm(pos, axis=1)
+        for r in tqdm(rPos):
+            try:
+                density[int((r - r_min) // dr)] += 1 / (2 * np.pi * dr * r)
+            except:
+                pass
+
+        return density
+
+    if mode == "radial3D":
+        density = np.zeros(bins.shape[0])
+        r_min = bins[0]
+        dr = bins[1] - bins[0]
+        rPos = np.linalg.norm(pos, axis=1)
+        for r in tqdm(rPos):
+            try:
+                density[int((r - r_min) // dr)] += 1 / (4 * np.pi * dr * r**2)
+            except:
+                pass
+
+        return density
