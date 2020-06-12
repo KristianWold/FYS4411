@@ -69,9 +69,9 @@ class HarmonicOsc():
 
 
 class Coulomb():
-    def __init__(self, alpha, shield_const):
+    def __init__(self, alpha, beta):
         self.alpha = alpha
-        self.shield_const = shield_const
+        self.beta = beta
 
     def __call__(self, x, num_part, dim):
         V = 0
@@ -80,7 +80,7 @@ class Coulomb():
                 r12 = tf.norm(x[:, i * dim:(i + 1) * dim] -
                               x[:, j * dim:(j + 1) * dim], axis=1)
                 r12 = tf.reshape(r12, (-1, 1))
-                V += self.alpha / tf.math.sqrt(r12**2 + self.shield_const**2)
+                V += self.alpha / tf.math.sqrt(r12**2 + self.beta**2)
 
         return V
 
@@ -125,3 +125,27 @@ def oneBodyDensity(pos, bins, mode="radial"):
                 pass
 
         return density
+
+    if mode == "1D":
+        density = np.zeros(bins.shape[0])
+        x_min = bins[0]
+        dx = bins[1] - bins[0]
+        for x in tqdm(pos):
+            try:
+                density[int((x - x_min) // dx)] += 1
+            except:
+                pass
+
+        return density / dx
+
+    if mode == "2D":
+        density = np.zeros((bins.shape[0], bins.shape[0]))
+        y_min = x_min = bins[0]
+        dy = dx = bins[1] - bins[0]
+        for x, y in tqdm(pos):
+            try:
+                density[int((x - x_min) // dx), int((y - y_min) // dy)] += 1
+            except:
+                pass
+
+        return density / pos.shape[0]
