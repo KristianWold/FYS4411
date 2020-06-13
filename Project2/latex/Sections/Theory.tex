@@ -1,0 +1,199 @@
+\section{Theory}\label{sec:Theory}
+
+\subsection{The System}
+\subsubsection{The Potentials}
+
+The Hamiltonian under investigation describes \(N\) bosons in a potential trap,
+and is on the form
+
+\begin{equation*}
+H = \sum_{i=1}^{N}\left( \frac{-\hbar^{2}}{2m}\nabla^{2}_{i} + V_{\text{ext}}(\vb{r}_{i})\right) + \sum_{i<j}^{N}V_{\text{int}}(\vb{r}_{i}, \vb{r}_{j})
+\end{equation*}
+
+where \(V_{\text{ext}}\) is the external potential of the trap while
+\(V_{\text{int}}\) is the internal potential between the particles. 
+The external potential has an elliptical form, being anisotropic in the \(z\)-direction:
+
+\begin{equation}
+\label{eq:2}
+V_{\text{ext}}(\vb{r}) = \frac{1}{2}m\left( \omega\left[ x^{2} + y^{2} \right] + \omega_{z}z^{2} \right)
+\end{equation}
+
+The internal potential is a hard shell potential, being infinite for distances
+where two bosons overlap:
+
+\begin{equation*}
+V_{\text{int}} = \begin{cases}
+\infty, &\text{for } |r_{i} - r_{j}| \le 0\\
+0, &\text{otherwise}
+\end{cases}
+\end{equation*}
+
+\subsubsection{Non-interacting Case}
+For non-interacting bosons in a spherical with \(\beta = 1\) and \(a = 0\) the
+system reduces to spherical harmonic oscillators where analytical solutions are
+available. The trial wavefunction reduces to simply the product of one body
+elements
+
+\newcommand{\psit}{\Psi_T(\vb{r})}
+\newcommand{\onebody}{\prod_{i}^{N}\exp{-\alpha\left[\left( x_i^2 + y_i^2 + \beta
+		z_i^2\right)\right]}}
+\begin{align*}
+\psit = \prod_{i}^{N}\exp[-\alpha\left( x_{i}^{2}+y_{i}^{2}+z_{i}^{2} \right)] = \prod_{i}^{N}\exp(-\alpha \abs{r_{i}}^{2})
+\end{align*}
+
+while the Hamiltonian reduces to
+
+\begin{align*}
+H = \sum_{i}^{N} \frac{-\hbar^{2}}{2m}\nabla_{i}^{2} + \frac{1}{2}m\omega^{2}r_{i}^{2}
+\end{align*}
+
+which in natural units is
+
+\newcommand{\lapl}[1]{\nabla_{#1}^2}
+\begin{align*}
+H = \frac{1}{2}\sum_{i}^{N} -\frac{1}{m}\lapl{i} + m\omega^{2}r_{i}^{2}
+\end{align*}
+
+Applying the Hamiltonian gives the local energy as
+
+\begin{align*}
+E_{L} = \frac{\alpha d}{m} N + \left( \frac{1}{2}m\omega^{2} - \frac{2\alpha^{2}}{m} \right)\sum_{i}^{N}r_{i}^{2}
+\end{align*}
+where \(d\) is the dimension. As the factor \(\sum r_{i}^{2}\) is always
+positive, its term should be minimized, which is accomplished by setting
+\(\alpha = \frac{m\omega}{2}\), giving a minimal local energy of
+
+\begin{equation}
+E_{L} = \frac{\omega d N}{2}
+\label{eq:noninteracting}
+\end{equation}
+
+\subsubsection{Interacting Case}
+The local energy for the full interacting case is much more complicated. The
+full computation is deferred to appendix~\ref{appendix:le}. The expression
+evaluates to
+
+\begin{align*}
+E_{L} &= -\frac{1}{2m}\sum_{i}\bigg[4\alpha^{2}\left(  x_{k}^{2}\uvec{i} + y_{k}^{2}\uvec{j} + \beta^{2} z_{k}^{2}\uvec{k}  \right)\\
+&-2\alpha(d-1+\beta)\\
+&- 4\alpha\left(  x_{k}\uvec{i} + y_{k}\uvec{j} + \beta z_{k}\uvec{k}  \right)
+\sum_{l\neq k} \frac{\vb{r}_{k}-\vb{r}_{l}}{r_{kl}}u^{\prime}\left( r_{kl} \right)\\
+&+ \sum_{i\neq k}\sum_{j\neq k}\frac{\left( \vb{r}_{k}-\vb{r}_{i} \right)\left( \vb{r}_{k} -\vb{r}_{j} \right)}{r_{ki}r_{kj}}u^{\prime}\left( r_{ki} \right)u^{\prime}\left( r_{kj} \right)\\
+&+ \sum_{l\neq k} \left( u^{\prime\prime}\left( r_{kl} \right)  + \frac{2}{r_{kl}}u^{\prime}(r_{kl})\right)\bigg]\\
+&+ \sum_{i}V_{\text{ext}}(\vb{r}_{i}) + \sum_{i<j}V_{\text{int}}\left( \vb{r}_{i}, \vb{r}_{i} \right)
+\end{align*}
+
+\subsection{Variational Monte Carlo}
+In order to find a good candidate wavefunction for a given potential, one can
+employ the \textit{variational principle}. One starts by guessing a trial
+wavefunction \(\ket{\Psi_{T}}\) and estimating the trial energy, which is
+guaranteed to be equal to or higher than the true ground state energy \(E_{0}\):
+\begin{equation}
+  \label{eq:1}
+  E_{0} \le E = \frac{\ev{H}{\Psi_{T}}}{\ip{\Psi_{T}}}
+\end{equation}
+
+If \(\ket{\Psi_{T}}\) is an eigenfunction of the Hamiltonian, the variance
+\(\sigma^{2}\) will be minimal
+
+\begin{equation*}
+  \sigma^{2} = \frac{\ev{H^{2}}{\Psi_{T}}}{\ip{\Psi_{T}}} -\left( \frac{\ev{H}{\Psi_{T}}}{\ip{\Psi_{T}}} \right)^{2} = 0
+\end{equation*}
+
+The variational principle expands on this idea by letting \(\ket{\Psi_{T}}\) be
+a functional class of a \textit{variational parameter} \(\alpha\). By varying
+\(\alpha\) one can find the optimal trial wavefunction within the functional
+class by minimizing \(\sigma^{2}\). 
+
+Only a small collection of potentials have analytical solution using the
+variational principle. For most potentials, one must numerically
+integrate~\eqref{eq:1} using Monte Carlo integration.
+
+For a stochastic variable \(x\) with probability density function \(p(x)\), the
+average \(\left< x \right>\) is defined as
+\begin{equation*}
+  \left< x \right> = \int_{\mathbb{R}} xp(x)\dd x
+\end{equation*}
+By sampling the stochastic variable \(M\) times, the average can be approximated
+by 
+
+\begin{equation*}
+  \expval{x} = \int_{\mathbb{R}} xp(x)\dd x \approx \frac{1}{M}\sum_{i=1}^{M}x_{i}p(x_{i})
+\end{equation*}
+
+Applying this to an observable \(\mathcal{O}\), we have
+
+\begin{align*}
+  \expval{\mathcal{O}} &= \ev{\mathcal{O}}{\Psi}\\
+                       &= \int \dd \vb{r} \Psi^{*}\mathcal{O}\Psi \\
+                       &= \int \dd \vb{r} \abs{\Psi}^{2} \frac{1}{\Psi}\mathcal{O}\Psi\\
+  &= \frac{1}{M} \sum_{i=1}^{M}p(\vb{r})\mathcal{O}_{L}
+\end{align*}
+
+where \(\abs{\Psi}^{2}\) is defined as the probability density function, and
+\(\frac{1}{\Psi}\mathcal{O}\Psi\) the \textit{local operator}.
+
+The local trial energy can then be defined as
+\begin{equation*}
+  E_{L} =\frac{1}{\Psi_{T}}H\Psi_{T}
+\end{equation*}
+which can be computed using Monte Carlo integration as
+
+\begin{align*}
+  \expval{E_{L}} \approx \frac{1}{M}\sum_{i=1}^{M} p(\vb{r}_{i})E_{L}(\vb{r}_{i})
+\end{align*}
+
+The goal is therefore to minimize minimizing \(\sigma^{2} = \expval{E_{L}^{2}} -
+\expval{E_{L}}^{2}\) over the variational parameter \(\alpha\).
+
+\subsection{DNN and RNN}
+
+
+\subsection{Autoregressive Models}
+
+
+\subsection{Metropolis-Hastings}
+
+The estimate of the local energy relies on samples from the trial wave function.
+To get a physical value, the configuration of the particles must be as physical
+and probable. As the configuration achieving this is unknown, the configuration
+space must be explore. This is done through Monte Carlo simulation, more
+specifically by using the Metropolis-Hastings algorithm.
+
+At each MC step a single particle is chosen at random, and a change to its
+position is proposed by moving it a fixed step length \(\Delta\) and computing the
+ratio between new and old probability densities
+\begin{align*}
+\omega = \frac{P\left( \vb{r}_{r}, \ldots, \vb{r}_{k}^{*}, \ldots, \vb{r}_{n} \right)}{P\left( \vb{r}_{r}, \ldots, \vb{r}_{k}, \ldots, \vb{r}_{n} \right)}
+=  \frac{\left| \Psi_{T}\left( \vb{r}_{r}, \ldots, \vb{r}_{k}^{*}, \ldots, \vb{r}_{n} \right)\right|^{2}}{\left| \Psi_{T}\left( \vb{r}_{r}, \ldots, \vb{r}_{k}, \ldots, \vb{r}_{n} \right)\right|^{2}}
+\end{align*}
+where \(\vb{r}^{*}\) denotes a modified position.
+If the ratio \(\omega\) is greater
+than a
+uniformly distributed number \(\theta \in [0, 1]\), the move is accepted.
+This ratio can often be reduced analytically to obviate the need for recomputing
+the entire probability density each step.
+
+
+\subsection{Onebody Density}
+
+A useful way to understand a many body system is to integrate over all
+dimensions except for one, yielding the \textit{one body density}
+\(\rho(\vb{r})\), defined as
+
+\begin{align*}
+  \rho( \vb{r} ) = \int \dd \mathbf{r}_{2} \ldots \dd \mathbf{r}_{N} \left| \psit \right|^{2}
+\end{align*}
+
+It is a scaled probability density function giving the number of particles
+within the volume \(\Delta \vb{r}\) as \(\rho(\vb{r})\Delta \vb{r}\).
+By convention the integral over all \(\dd \vb{r}\) yields the total number of
+particles in the system, \(N\).
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
