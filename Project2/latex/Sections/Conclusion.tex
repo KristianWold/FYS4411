@@ -1,6 +1,12 @@
 \begin{minipage}{\columnwidth}
 \section{Conclusion}\label{sec:Conclusion}
+When using neural network based trial wave function to approximate the solution of Hamiltonians defined on continuous space, it is necessary to use activation function with continuous derivatives, such as Tanh, rather than Relu with discontinuous derivatives. As seen from \autoref{fig:one_part_local_kinetic}, using ReLu activation resulted in a local kinetic energy that did not match the analytical, but rather a piece-wise constant function.
 
+Moving to the RNN-DNN model, the model perform well in the non-interacting case, both in 2D and 3D and for two and six particles. In all cases, the relative numerical error was of order $0.1\%$, as seen in \autoref{tab:2}. Generally, VMC often achieve results accurate to machine precision in the case of non-interacting systems. This is because the trial wave function is carefully picked to include the analytical ground state in its function space. In the case of the RNN-DNN model, the trial wave function is much more flexible and completely general. It essentially learns the solution from scratch, without having any prior information about the system other than the Hamiltonian.
+
+When targeting two interacting bosons in 1D, 2D and 3D, it was required to increase the complexity of the model, up the batch size and extend the training in order to keep the error to a minimum. This was likely due to the increased complex because of the correlation introduced by the interaction. Although the result was not as accurate as in the non-interacting case, the relative error was still under $1\%$, as seen in \autoref{tab:3}.
+
+While the model is able to obtain good accuracy for the ground state energy, it seem to struggle a bit more approximating the correct one-body density. This can be seen by comparing \autoref{fig:many_part_int_onebody} and \autoref{fig:onebody_oyvind} 
 
 \end{minipage}
 
