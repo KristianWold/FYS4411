@@ -84,10 +84,10 @@ After the previous training, the radial one-body density is calculated using $N=
 	\label{tab:1}
 \end{table}
 
-In \autoref{tab:1}, a summary of the estimated ground stated energies of the DNN model trained on the previously discussed systems is presented. Without too much concern for choice of parameters, such as batch size, number of metropolis steps, or network architecture, all models but the Relu model produces results to accurate to $1\%-3\%$.
+In \autoref{tab:1}, a summary of the estimated ground stated energies of the DNN model trained on the previously discussed systems is presented. Without too much concern for choice of parameters, such as batch size, number of metropolis steps, or network architecture, all models but the Relu model produces results to accurate to $0.1\%-0.3\%$.
 
 
-\subsection{RNN-DNN Hybrid Model for Non-Interacting Bosonic Quantum Dots}
+\subsection{RNN-DNN Model for Non-Interacting Bosonic Quantum Dots}
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_nonint_training1.pdf}
 	\caption{Estimate of energy during training of RNN-DNN hybrid models. The models were trained on two non-interacting bosons in 2D and 3D harmonic oscillator. The models were trained for 1000 epochs, using a batch size of 500.}
@@ -142,7 +142,7 @@ Using $N=1e6$ samples, the ground state energy was estimated to be $E = 2.552(1)
 \begin{figure}[H]
 	\includegraphics[scale = 0.4]{figures/oyvind.png}
 	\caption{One-body density for two interacting bosons in 1D harmonic oscillator using CISD,courtesy Øyvind Schøyen}
-	\label{fig:many_part_int_onebody}
+	\label{fig:onebody_oyvind}
 \end{figure}
 
 \autoref{fig:many_part_int_onebody} shows the corresponding one body density, which shows the characteristic separation of two peaks caused by the repulsive interaction. Comparing with the one-body density produced with the CISD simulation, the peaks are not as sharply defined. In terms of ground state energy, the RNN-DNN model successfully accounts for the correlation of the system, showing that the hidden state is able to encode the correlation in a meaningful way. However, like other approches in machine learning VMC, such as RBM, it struggles to reproduce the correct one-body density. 
