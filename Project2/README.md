@@ -14,7 +14,7 @@
 <br>
 
 
-<!-- <img height="700px" align="center" src="latex/figures/solarsys.png?raw=true"> -->
+<img height="700px" align="center" src="latex/figures/hybrid.png?raw=true">
 
 ## Overview
 The aim of this project is to develop a neural network architecture that manages to reproduce the wave function of
