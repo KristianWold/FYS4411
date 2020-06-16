@@ -1,12 +1,35 @@
 \section{Introduction}
 
-Problems in many-particle quantum mechanics is notoriously hard, and has over many years resulted in a suit of methods and techniques for solving them efficiently and reliably. A popular family of such methods is Variational Monte-Carlo, which parameterize a trial wave function and seeks to optimize the parameters in order to minimize the expected energy, thus approximating the ground state of the system. While classic VMC methods, such as trial wave functions with Jastrow factors, have proved useful, they come with some weaknesses: The inflexibility of the trial wave function may lead to poor approximations of the real ground state, even if a global minimum in energy for the particular trial wave function was obtain. Further, observables are hard to estimate from trial wave functions, because popular methods for sampling, such as MCMC, tends to produce data with high degree of auto-correlation(sitat). This is even more true for larger systems, and leads to a high statistical uncertainty in estimated observables.
+Problems in many-particle quantum mechanics is notoriously hard, and has over
+many years resulted in a suit of methods and techniques for solving them
+efficiently and reliably. A popular family of such methods is Variational
+Monte-Carlo, which parameterize a trial wave function and seeks to optimize the
+parameters in order to minimize the expected energy, thus approximating the
+ground state of the system. While classic VMC methods, such as trial wave
+functions with Jastrow factors, have proved useful, they come with some
+weaknesses: the inflexibility of the trial wave function may lead to poor
+approximations of the real ground state, even if a global minimum in energy for
+the particular trial wave function was obtain. Further, observables are hard to
+estimate from trial wave functions, because popular methods for sampling, such
+as MCMC, tends to produce data with high degree of auto-correlation\cite{Blocking}. This
+is even more true for larger systems, and leads to a high statistical
+uncertainty in estimated observables. 
 
-In recent years, drawing inspiration from Deep Learning, Artificial Neural Networks have been employed as trial wave functions with great success (sitat). Because of the huge number of parameters, Artificial Neural Networks tend to be much more flexible than classical Trial Wave Functions. However, this results in a greater challenge to optimize the parameters, and the usual problem with auto-correlated samples is still present.
+Drawing inspiration from Deep Learning, Artificial~Neural~Networks~(ANN) have in recent years been employed to model wave functions with great success\cite{pfau2019abinitio}.
+Because of the huge number of parameters, ANNs tend to be
+much more flexible than classical trial wave functions. However, there is the
+new challenge to optimize the parameters, and the usual problem with
+auto-correlated samples is still present. 
 
-To address the latter problem, some papers have very recently succeeded in employing auto-regressive models on spin-systems, such as Quantum Ising-model. To obtain a spin-configuration, each spin is sampled in sequence, each time conditioning on the previous sampled spins. Because of the nature of auto-regressive models, all sampled spin-configurations are uncorrelated, removing the problem with high statistical variance in estimating observables.
+To address the latter problem, recent advances\cite{hibatallah2020recurrent,Sharir_2020} have  succeeded in
+employing auto-regressive models on spin-systems, such as Quantum Ising-model.
+To obtain a spin-configuration, each spin is sampled in sequence, each time
+conditioning on the previous sampled spins. Because of the nature of
+auto-regressive models, all sampled spin-configurations are uncorrelated,
+removing the problem with high statistical variance in estimating observables. 
 
-In this paper, we present an autoregressive model for bosonic quantum dots based on Recurrent Neural Networks, inspired by the work of (sitat).
+In this paper, we present an autoregressive model for bosonic quantum dots based
+on Recurrent Neural Networks, inspired by the work of (sitat). 
 
 %%% Local Variables:
 %%% mode: latex
