@@ -6,12 +6,14 @@ Moving to the RNN-DNN model, the model perform well in the non-interacting case,
 
 When targeting two interacting bosons in 1D, 2D and 3D, it was required to increase the complexity of the model, up the batch size and extend the training in order to keep the error to a minimum. This was likely due to the increased complex because of the correlation introduced by the interaction. Although the result was not as accurate as in the non-interacting case, the relative error was still under $1\%$, as seen in \autoref{tab:3}.
 
-While the model is able to obtain good accuracy for the ground state energy, it seem to struggle a bit more approximating the correct one-body density. This can be seen by comparing \autoref{fig:many_part_int_onebody} and \autoref{fig:onebody_oyvind}. Stuff
+While the model is able to obtain good accuracy for the ground state energy, it seem to struggle a bit more approximating the correct one-body density. This can be seen by comparing \autoref{fig:many_part_int_onebody} and \autoref{fig:onebody_oyvind}. The one-body density produced by the RNN-DNN model is somewhat asymmetrical, and the separation of the peaks are not as sharply defined as the benchmark. It is a common problem with machine learning VMC approaches, such as RBM, that the one-body density does not match the physical. This is perhaps the case for our model as well.
 
 \end{minipage}
 
 \section{Future Work}
-  
+This paper focused on testing weather or not it was possible to create a model with auto-regressive properties for bosonic quantum dots. Having achieved promising results, the way forward is to test the method for larges systems of interacting particles. This was not done in this paper because of a lack of appropriate benchmarks to compare with. Testing on bigger systems, it will be important determine how parameters number should be increased in order to keep results accurate. In doing this, it will also be revealed how the computational complexity of the model scales with increasing system size, and if having the auto-regressive property leads to any significant speedup with respect to more classical VMC approaches.
+
+In testing bigger systems, the encoding of the correlation done by the RNN will likely be a more challenging task. Other RNN architectures, like GNU and LSTM, should be explored.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
