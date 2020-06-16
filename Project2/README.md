@@ -13,11 +13,8 @@
 </p>
 <br>
 
-<object data="latex/figures/net.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="latex/figures/net.pdf">
-        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="latex/figures/net.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
+
+<img height="700px" align="center" src="latex/figures/net.svg">
 
 ## Overview
 The aim of this project is to develop a neural network architecture that manages to reproduce the wave function of
