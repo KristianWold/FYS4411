@@ -118,8 +118,8 @@ In \autoref{fig:many_part_nonint_training1} and \autoref{fig:many_part_nonint_tr
 
 From \autoref{tab:2}, we see that the RNN-DNN model attains good accuracy for the non-interacting case, both in 2D and 3D, averaging a relative error of $0.1\%$.
 
-\subsection{RNN-DNN Model for Interacting Bosonic Quantum Dots}
-\subsubsection{Two particles in 1D Harmonic Trap}
+\subsection{RNN-DNN Model for Two Interacting Bosonic in 1D Quantum Dots}
+\subsubsection{Training}
 
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_int_training1.pdf}
@@ -131,8 +131,10 @@ In \autoref{fig:many_part_int_training1}, we see the training process of two int
 
 Using $N=1e6$ samples, the ground state energy was estimated to be $E = 2.552(1)$. Compared to $E = 2.5482$ CISD energy using 40 orbitals(courtesy Øyvind Schøyen), the relative error is about $0.1\%$.
 
+\subsubsection{One-Body Density}
+
 \begin{figure}[H]
-	\includegraphics[]{figures/many_part_int_training1.pdf}
+	\includegraphics[]{figures/many_part_int_onebody.pdf}
 	\caption{One-body density for two interacting bosons in 1D harmonic oscillator. The density was calculated using $N=4e5$ samples and $100$ bins on the interval $[-8,8]$.}
 	\label{fig:many_part_int_onebody}
 \end{figure}
@@ -145,28 +147,74 @@ Using $N=1e6$ samples, the ground state energy was estimated to be $E = 2.552(1)
 
 \autoref{fig:many_part_int_onebody} shows the corresponding one body density, which shows the characteristic separation of two peaks caused by the repulsive interaction. Comparing with the one-body density produced with the CISD simulation, the peaks are not as sharply defined. In terms of ground state energy, the RNN-DNN model successfully accounts for the correlation of the system, showing that the hidden state is able to encode the correlation in a meaningful way. However, like other approches in machine learning VMC, such as RBM, it struggles to reproduce the correct one-body density. 
 
+\subsubsection{Conditional Probabilities}
+
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_con1.pdf}
 	\caption{One-body density for two interacting bosons in 1D harmonic oscillator. The density was calculated using $N=4e5$ samples and $100$ bins on the interval $[-8,8]$.}
-	\label{fig:many_part_con1.pdf}
+	\label{fig:many_part_con1}
 \end{figure}
 
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_con2.pdf}
 	\caption{One-body density for two interacting bosons in 1D harmonic oscillator. The density was calculated using $N=4e5$ samples and $100$ bins on the interval $[-8,8]$.}
-	\label{fig:many_part_con2.pdf}
+	\label{fig:many_part_con2}
 \end{figure}
 
+In \autoref{fig:many_part_con1} and \autoref{fig:many_part_con2}, we see the conditional probabilities produced by the RNN-DNN model trained on two interacting bosons in 1D harmonic oscillator. In \autoref{fig:many_part_con1}, we see that the probability density for particle 1 is skewed towards the left. As there is no physical reason for why the first sampled particle is found more often to the left, one should think of the conditional probabilities more as rules for sampling the particles, rather than physical objects. In fact, given $P(x_1, x_2)$, there is no unique way of factoring it to conditional probabilities: 
+\begin{align*}
+	P(x_1, x_2) = P(x_1)P(x_2|x_1) =\\
+	f(x_1)P(x_1)\frac{P(x_2|x_1)}{f(x_1)} = \tilde{P}(x_1)\tilde{P}(x_2|x_1),
+\end{align*}
+where $f(x_1)$ is an arbitrary function.
 
-
+In \autoref{fig:many_part_con2}, we see however that some physical meaning is retained. The probability density of particle two conditioned on particles one's position act as to avoid particle one. Given particle one's position, the probability of sampling particle two's position close to it is relatively small compared to sampling it further away. This is a reflection of the repulsive potential, which pushes the particles appart.
  
+\subsubsection{Sampling from Conditional Probabilities}
+Next, we inspect if using Bruteforce Metropolis to sample from distributions produce densities that are faithful to that distribution.
 
+\begin{figure}[H]
+	\includegraphics[]{figures/many_part_met.pdf}
+	\caption{One-body density for two interacting bosons in 1D harmonic oscillator. The density was calculated using $N=4e5$ samples and $100$ bins on the interval $[-8,8]$.}
+	\label{fig:many_part_met}
+\end{figure}
 
+In \autoref{fig:many_part_met}, the target probability density is $P(x_2|x_1=0.5)$ produced by the RNN-DNN model trained on the system as previously discussed. The densities were estimated using Bruteforce Metropolis with a step length of $1$ and va varying number of thermalization steps. For a low number of steps, such as $10$, it can be seen from the figure that the estimated density does not match the one produced by the model. Since the random walkers start off uniformly, they need a sufficient amount of steps so that they don't end up getting stuck in low probability areas, as seen to the left in the figure. If this happens, we fail to sample variables that are distributed as our model dictates. From the figure, we see that a increased number of steps remedy this.  
 
+\subsection{RNN-DNN Model for Two Interacting Bosonic In Higher Dimension}
 
-\subsection{}
+\subsubsection{Ground Sate Energy}
 
+\begin{table}[ht]
+	\begin{tabular}{r|rr}
+		\toprule
+		      & RNN-DNN   & DMC     \\
+		2D    & 3.014(3)  &  3.00000(1) \\
+		3D    & 3.751(1)  &   3.730123(3) \\
+		\bottomrule
+	\end{tabular}
+	\caption{Estimated ground state energies of the RNN-DNN model train on two interacting bosons in 2D and 3D harmonic oscillator, respectively. In both cases, 10 hidden units and two layers of 64 and 32 nodes were used. The batch size was 4000 and the models were trained for 1000 epochs. The energy was estimated using $N=1e5$ samples.}
+	\label{tab:3}
+\end{table}
 
+From \autoref{tab:3}, we see the estimated ground state energy of the RNN-DNN model trained on two interacting bosons in 2D and 3D harmonic oscillator. Taking the DMC calculation as ground truth, the numerical error is under $1\%$ in 2D and 3D, as with the 1D case. 
+
+\subsubsection{One-Body Density}
+\begin{figure}[H]
+	\includegraphics[]{figures/many_part_3D.pdf}
+	\caption{One-body density for two interacting bosons in 1D harmonic oscillator. The density was calculated using $N=4e5$ samples and $100$ bins on the interval $[-8,8]$.}
+	\label{fig:many_part_3D}
+\end{figure}
+
+\begin{figure}[H]
+	\includegraphics[scale=0.6]{figures/onebody3d.png}
+	\caption{One-body density for two interacting bosons in 1D harmonic oscillator. The density was calculated using $N=4e5$ samples and $100$ bins on the interval $[-8,8]$.}
+	\label{fig:many_part_DMC}
+\end{figure}
+
+In \autoref{fig:many_part_3D} and \autoref{fig:many_part_DMC} we see the radial one-body density of two interacting bosons in 3D harmonic oscillator calculated using our RNN-DNN model and DMC, respectably. Note that technically, the DMC calculation was performed on a two electron system, but since this state is symmetrical with respect to spatial coordinates, it is comparable to our bosonic system. In addition, the density is not scaled.
+
+Since the figures are produced independently, they are hard to compare. However, some general features can be seen: 1/3 of the max amplitude occur around $r=1$, and the density have almost completely diminished around $r=2$. On the other hand, the density produced by the RNN-DNN model is not as linear towards the origin as the DMC density, again indicating the our model may struggle reproducing the correct one-body density.
 
 
 %%% Local Variables:
