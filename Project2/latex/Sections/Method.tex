@@ -66,6 +66,7 @@
 
  % Final cell
  \node (dots) [annot, right of=dnn1] {\(\ldots\)};
+ \node (dots_2) [annot, xshift=1cm] at (rnn1) {\(\ldots\)};
  \node (xi2)  [var, right of=dnn1, xshift=2cm, pin=left:\(\tilde{x}_{0}^{N}\)] {\(\tilde{x}_{i}^{N}\)};
  \node (dnn2)  [net, right of=xi2] {DNN};
  \node (psi2)  [var, above of=dnn2] {\(\psi_{i}^{N}\)};
