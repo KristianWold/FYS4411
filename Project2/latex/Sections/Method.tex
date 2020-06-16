@@ -66,6 +66,7 @@
 
  % Final cell
  \node (dots) [annot, right of=dnn1] {\(\ldots\)};
+ \node (dots_2) [annot, xshift=1cm] at (rnn1) {\(\ldots\)};
  \node (xi2)  [var, right of=dnn1, xshift=2cm, pin=left:\(\tilde{x}_{0}^{N}\)] {\(\tilde{x}_{i}^{N}\)};
  \node (dnn2)  [net, right of=xi2] {DNN};
  \node (psi2)  [var, above of=dnn2] {\(\psi_{i}^{N}\)};
@@ -94,7 +95,8 @@
  --($(rnn0) + (1,0.8)$) -- ($(hidden0) + (0.7,0.8)$) -- ($(psi0) + (0.7,1)$) -- ($(xi0) + (-1.4,3)$)-- cycle;
 \end{tikzpicture}
 \caption{\label{fig:architecture}
-  Diagrammatic overview of the neural network architecture. The shaded
+  Diagrammatic overview of the neural network architecture for a system of \(N\)
+  bosons. The shaded
   blue region is a single ``cell'' consisting of a RNN to update the hidden
   state, a DNN to evaluate the position wave function, and a brute force
   Metropolis sampler to sample the position space. The Metropolis sampling yields a
@@ -107,7 +109,7 @@
 \(\tilde{x}_{0}^{i}\)}
 \end{figure*}
 
-A novel neural networks architecture has been built to obtain uncorrelated
+A novel neural network architecture has been built to obtain uncorrelated
 samples from the position wave function of bosons in finite potentials. A
 diagram is shown in~\cref{fig:architecture}.
 It consists of three main parts: a DNN, a RNN and a MCMC sampler.
@@ -143,42 +145,66 @@ energy of the system. Since the RNN-DNN model is made using the popular neural
 network framework Tensorflow(2), it feels natural to use its automatic
 differentiation functionality to calculate the Laplacian of the model with
 respect to the inputs(the positions). However, for more than one dimensional
-input, it turns out to be quite difficult, although a work-around proposed by
-(sitat) resolved the difficulty. The problem was as follow:  
+input, it turns out to be quite difficult, although a work-around proposed by~\cite{laplace}
+resolved the difficulty. The problem was as follow:  
 
-Starting with an input $x$ of dimension $(batch\_size, d)$, a forward pass through the model results in an output $y$ of dimension $(batch\_size, 1)$, since the wave function evaluates to a scalar value. When performing \textbf{grad\_y = tf.gradients(y,x)}, we get 
+Starting with an input $x$ of dimension $(\textsf{batch\_size}, d)$, a forward
+pass through the model results in an output $y$ of dimension $(\textsf{batch\_size}, 1)$,
+as the wave function evaluates to a scalar value. When performing
+\mintinline{python}{grad_y = tf.gradients(y,x)}, we get  
 \begin{equation*}
-	grad\_y = \left(\frac{\partial y}{\partial x_1}, \cdots, \frac{\partial y}{\partial x_d}\right),
+	\textsf{grad\_y} = \left(\frac{\partial y}{\partial x_1}, \cdots, \frac{\partial y}{\partial x_d}\right),
 \end{equation*}
-which has dimensional $(batch\_size, d)$. The problem arises when calculating the second derivative \textbf{grad2\_y = tf.gradients(grad\_y,x)}
+which has dimensional $(\textsf{batch\_size}, d)$. The problem arises when
+calculating the second
+derivative \mintinline{python}{grad2_y = tf.gradients(grad_y,x)}, symbolically
 
 \begin{equation*}
-	grad2\_y = \left(\sum_{i=1}^{d}\frac{\partial^2 y}{\partial x_1 \partial x_i}, \cdots, \sum_{i=1}^{d}\frac{\partial^2 y}{\partial x_1 \partial x_i}\right).
+	\textsf{grad2\_y} = \left(\sum_{i=1}^{d}\frac{\partial^2 y}{\partial x_1 \partial x_i}, \cdots, \sum_{i=1}^{d}\frac{\partial^2 y}{\partial x_1 \partial x_i}\right).
 \end{equation*}
-Since \textbf{tf.gradients} is meant to be used for gradient descent, a summation of the derivatives of all outputs w.r.t the input $x$ is performed, which should not be present in the Laplacian.
+Since \mintinline{python}{tf.gradients} is meant to be used for gradient
+descent, a summation of the derivatives of all outputs w.r.t the input $x$ is
+performed, which should not be present in the Laplacian. 
 The naïve solution is to slice the output after the first differentiation, such as\newline 
-\textbf{tf.gradients(grad\_y[i],x[i])}. Sadly, slicing this way does not respect the computational graph constructed during forward pass, and \textbf{x[i]} is interpreted as a new variable not related to \textbf{grad\_y[i]}. The fix is to use clever reshaping of the input variable \textbf{x} before passing it to the model, in order to allow for the wanted slicing without destroying the computational graph. Details can be seen in (sitat) and in our source code. 
+\mintinline{python}{tf.gradients(grad_y[i],x[i])}. Sadly, slicing this way does not respect
+the computational graph constructed during forward pass, and \mintinline{python}{x[i]} is
+interpreted as a new variable not related to \mintinline{python}{grad_y[i]}. The fix is to
+use clever reshaping of the input variable \mintinline{python}{x} before passing it to the
+model, in order to allow for the wanted slicing without destroying the
+computational graph. Details can be found in~\cite{laplace} and in our source code.  
 
 \subsection{Optimization}
 During the training procedure of the RNN-DNN model, we use the following expression for the loss value:
 \begin{equation*}
 	L = 2\sum_{i=1}^{N_B}\ln(\psi_i) (E_i - E)
 \end{equation*}
-where $N_B$ is the batch size, $psi_i$ and $E_i$ is the wave function and local energy of sample $i$ in the batch, and $E$ is the average local energy over the whole batch. During gradient decent, the derivative of the loss value is differentiated w.r.t. the model parameters, and the gradient describes (ref) is recovered.
+where $N_B$ is the batch size, $\psi_i$ and $E_i$ are the wave function and
+local energy of sample $i$ of the batch, and $E$ is the average local energy
+over the whole batch. During gradient decent, the derivative of the loss value
+is differentiated w.r.t. the model parameters, and the gradient describes (ref)
+is recovered. 
 
-During vanilla gradient decent, the parameters are updated by performing a small step in the opposite direction of the computed gradient
+During vanilla gradient decent, the parameters are updated by performing a small
+step in the opposite direction of the computed gradient 
 
 \begin{equation*}
 	\theta \rightarrow \theta - \mu \nabla_\theta \langle E \rangle,
 \end{equation*}
 where $\theta$ is the parameters of the model, $\mu$ is the learning rate, and $\nabla_\theta \langle E \rangle$ is the derivative of the loss value. 
 
-As a better alternative to vanilla gradient decent, we use Tensorflows ADAM optimizer with default values, as it is a popular choice in the machine learning community.  
+As a better alternative to vanilla gradient decent, we use Tensorflows ADAM
+optimizer with default values, as it is a popular choice in the machine learning
+community.   
 
 \subsection{One-Body Density}
-To extract a one-body density from a Monte-Carlo simulation, we partition space into a number of bins in an appropriate range where the wave function is large. The bin size can be chosen small to get finer details of the density, but will require more data to mitigate statistical error.
+To extract a one-body density from a Monte-Carlo simulation, the space is
+partitioned into a number of bins in an appropriate range where the wave
+function is large. The bin size can be chosen small to get finer details of the
+density, but will require more data to mitigate statistical error. 
 
-For each particle configuration produced at every Metropolis step, the number of particles coinciding with each bin is checked. The one-body density is then produced by averaging over all Metropolis steps.
+For each particle configuration produced at every Metropolis step, the number of
+particles coinciding with each bin is checked. The one-body density is then
+produced by averaging over all Metropolis steps. 
 
 
 %%% Local Variables:
