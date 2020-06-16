@@ -360,6 +360,26 @@ initial states \(\bm{\sigma}_{0}\) and \(\vb{h}_{0}\), computing the resulting
 computation with \(\sigma_{1}\) and the now updated \(\vb{h}_{1}\), and
 iterating until \(N\) samples are obtained.
 
+\subsection{RNN Wave functions}
+
+In general, wave functions are complex valued. Our problem domain, however,
+only concerns itself with stochastic many-body Hamiltonian at ground state
+energy. These yield strictly real and positive wave
+functions\cite{Sharir_2020}. For a many-body system of \(N\) particles, the
+total wave function in position basis can be written as the product of all conditional single particle wave
+functions
+
+\begin{equation*}
+  \Psi(\vb{x}_{0}, \vb{x_{1}}, \ldots, \vb{x}_{N}) = \prod_{i=0}^{N}\psi_{i}(\vb{x}_{i}|\vb{x}_{i-1}, \ldots, \vb{x}_{0})
+\end{equation*}
+for positions \(\left\{  \vb{x}_{i}\right\}\). That each \(\psi_{i}\) is normalized is a
+sufficient condition for the total wave function to be
+normalized\cite{Sharir_2020}. However, this was not done here, as the wave
+function itself is only used as a ratio in the Metropolis sampling, eliminating 
+the need for normalizing. The conditional single particle wave functions can
+be obtained through the use of autoregressive RNN, illustrated in (b)
+of~\cref{fig:rnn}, with \(\bm{\sigma}_{i} = \vb{x}_{i}\).
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"
