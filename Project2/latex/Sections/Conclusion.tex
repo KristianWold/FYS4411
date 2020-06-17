@@ -13,7 +13,7 @@ While the model is able to obtain good accuracy for the ground state energy, it 
 \section{Future Work}
 This paper focused on testing whether or not it was possible to create a model with auto-regressive properties for bosonic quantum dots. Having achieved promising results, the way forward is to test the method for larger systems of interacting particles. This was not done in this paper because of a lack of appropriate benchmarks to compare with. Testing on bigger systems, it will be important determine how the number of parameters should be increased in order to keep results accurate. In doing this, it will also be revealed how the computational complexity of the model scales with increasing system size, and if having the auto-regressive property leads to any significant speedup with respect to more classical VMC approaches.
 
-In testing bigger systems, the encoding of the correlation done by the RNN will likely be a more challenging task. Other RNN architectures, like GNU and LSTM, should be explored.
+In testing bigger systems, the encoding of the correlation done by the RNN will likely be a more challenging task. Other RNN architectures, like GNU and LSTM, should be explored. Other optimization techniques, other than default ADAM, should also be explored. Optimization methods involving approximation of the curvature of the loss value has been shown to be effective \cite{pfau2019abinitio}. Also other methods for sampling, such as importance sampling, should be implemented for more efficiency.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../main"

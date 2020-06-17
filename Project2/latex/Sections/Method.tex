@@ -192,8 +192,7 @@ step in the opposite direction of the computed gradient
 where $\theta$ is the parameters of the model, $\mu$ is the learning rate, and $\nabla_\theta \langle E \rangle$ is the derivative of the loss value. 
 
 As a better alternative to vanilla gradient decent, we use Tensorflows ADAM
-optimizer with default values, as it is a popular choice in the machine learning
-community.   
+optimizer with learning rate $\mu = 0.01$, and otherwise default values, as it is a popular choice in the machine learning community.   
 
 \subsection{One-Body Density}
 To extract a one-body density from a Monte-Carlo simulation, the space is
