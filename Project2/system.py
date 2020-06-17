@@ -33,10 +33,12 @@ class Metropolis():
         total_accepted = 0
         dim = self.system.dim
 
+        # inital position for walkers
         x_old = tf.random.uniform(
             (batch_size, dim), minval=-2, maxval=2, dtype=tf.dtypes.float64)
         psi_old = self.system.Ansatz(x_old).numpy()
 
+        # thermalizing steps
         for i in range(self.steps):
             x_new = x_old + self.step_length * \
                 tf.random.uniform((batch_size, dim), minval=-1, maxval=1,
@@ -50,7 +52,8 @@ class Metropolis():
             x_old = x_old.numpy()
             x_new = x_new.numpy()
 
-            x_old[mask] = x_new[mask]  # move walkers
+            # update walkers
+            x_old[mask] = x_new[mask]
             psi_old[mask] = psi_new[mask]
             x_old = tf.convert_to_tensor(x_old, dtype=tf.dtypes.float64)
             total_accepted += np.sum(mask)

@@ -2,7 +2,7 @@
 
 \subsection{The System}
 \subsubsection{The Potentials}
-
+Throughout this paper, the usual natural units $m=\hbar = 1$ are used. 
 The Hamiltonian under investigation describes \(N\) bosons in a potential trap
 of the form
 
@@ -12,75 +12,28 @@ H = \sum_{i=1}^{N}\left( \frac{-\hbar^{2}}{2m}\nabla^{2}_{i} + V_{\text{ext}}(\v
 
 where \(V_{\text{ext}}\) is the external potential of the trap and 
 \(V_{\text{int}}\) is the internal potential between the particles. 
-The external potential has an elliptical form, being anisotropic in the \(z\)-direction:
+The external potential is a symmetric, harmonic oscialltor potential in three dimensions:
 
 \begin{equation}
 \label{eq:2}
-V_{\text{ext}}(\vb{r}) = \frac{1}{2}m\left( \omega\left[ x^{2} + y^{2} \right] + \omega_{z}z^{2} \right).
+V_{\text{ext}}(\vb{r}) = \frac{1}{2}\omega\left( x^{2} + y^{2} + z^{2}  \right).
 \end{equation}
 
-The internal potential is a hard shell potential, with infinite values when two bosons overlap:
+The corresponding 2D and 1D harmonic potential is gotten by removing the $z$ and $y$ dependancy from the above expression, in that order.
 
-\begin{equation*}
-V_{\text{int}} = \begin{cases}
-\infty, &\text{for } |r_{i} - r_{j}| \le 0\\
-0, &\text{otherwise.}
-\end{cases}
-\end{equation*}
+The internal potential is a shielded Coloumb potential:
 
-\subsubsection{Non-interacting Case}
-For non-interacting bosons in a spherical with \(\beta = 1\) and \(a = 0\) the
-system reduces to spherical harmonic oscillators where analytical solutions are
-available. The trial wavefunction reduces to simply the product of one body
-elements
+\begin{equation}
+	V(\vec{r_1}, \vec{r_2}) = \frac{\alpha}{\sqrt{|\vec{r_1} - \vec{r_2}|^2 + \beta^2}}
+\end{equation}
+
+In the case that $\beta = 0$, the potential reduces to normal Coloumb interaction, and in the case $\alpha = 0$, the system becomes non-interacting. 
 
 \newcommand{\psit}{\Psi_T(\vb{r})}
 \newcommand{\onebody}{\prod_{i}^{N}\exp{-\alpha\left[\left( x_i^2 + y_i^2 + \beta
 		z_i^2\right)\right]}}
-\begin{align*}
-\psit = \prod_{i}^{N}\exp[-\alpha\left( x_{i}^{2}+y_{i}^{2}+z_{i}^{2} \right)] = \prod_{i}^{N}\exp(-\alpha \abs{r_{i}}^{2})
-\end{align*}
 
-while the Hamiltonian reduces to
 
-\begin{align*}
-H = \sum_{i}^{N} \frac{-\hbar^{2}}{2m}\nabla_{i}^{2} + \frac{1}{2}m\omega^{2}r_{i}^{2}
-\end{align*}
-
-which in natural units is
-
-\newcommand{\lapl}[1]{\nabla_{#1}^2}
-\begin{align*}
-H = \frac{1}{2}\sum_{i}^{N} -\frac{1}{m}\lapl{i} + m\omega^{2}r_{i}^{2}.
-\end{align*}
-
-Applying the Hamiltonian gives the local energy as
-
-\begin{align*}
-E_{L} = \frac{\alpha d}{m} N + \left( \frac{1}{2}m\omega^{2} - \frac{2\alpha^{2}}{m} \right)\sum_{i}^{N}r_{i}^{2}
-\end{align*}
-where \(d\) is the dimension. As the factor \(\sum r_{i}^{2}\) is always
-positive, its term should be minimized, which is accomplished by setting
-\(\alpha = \frac{m\omega}{2}\), giving a minimal local energy of
-
-\begin{equation}
-E_{L} = \frac{\omega d N}{2}.
-\label{eq:noninteracting}
-\end{equation}
-
-\subsubsection{Interacting Case}
-The local energy for the full interacting case is much more complicated. The expression
-evaluates to
-
-\begin{align*}
-E_{L} &= -\frac{1}{2m}\sum_{i}\bigg[4\alpha^{2}\left(  x_{k}^{2}\uvec{i} + y_{k}^{2}\uvec{j} + \beta^{2} z_{k}^{2}\uvec{k}  \right)\\
-&-2\alpha(d-1+\beta)\\
-&- 4\alpha\left(  x_{k}\uvec{i} + y_{k}\uvec{j} + \beta z_{k}\uvec{k}  \right)
-\sum_{l\neq k} \frac{\vb{r}_{k}-\vb{r}_{l}}{r_{kl}}u^{\prime}\left( r_{kl} \right)\\
-&+ \sum_{i\neq k}\sum_{j\neq k}\frac{\left( \vb{r}_{k}-\vb{r}_{i} \right)\left( \vb{r}_{k} -\vb{r}_{j} \right)}{r_{ki}r_{kj}}u^{\prime}\left( r_{ki} \right)u^{\prime}\left( r_{kj} \right)\\
-&+ \sum_{l\neq k} \left( u^{\prime\prime}\left( r_{kl} \right)  + \frac{2}{r_{kl}}u^{\prime}(r_{kl})\right)\bigg]\\
-&+ \sum_{i}V_{\text{ext}}(\vb{r}_{i}) + \sum_{i<j}V_{\text{int}}\left( \vb{r}_{i}, \vb{r}_{i} \right).
-\end{align*}
 
 \subsection{Variational Monte Carlo}
 In order to find a good candidate wavefunction for a given potential, one can
@@ -89,7 +42,7 @@ wavefunction \(\ket{\Psi_{T}}\) and estimating the trial energy, which is
 guaranteed to be equal to or higher than the true ground state energy \(E_{0}\):
 \begin{equation}
   \label{eq:1}
-  E_{0} \le E = \frac{\ev{H}{\Psi_{T}}}{\ip{\Psi_{T}}}.
+  E_{0} \le \langle E \rangle = \frac{\ev{H}{\Psi_{T}}}{\ip{\Psi_{T}}}.
 \end{equation}
 
 If \(\ket{\Psi_{T}}\) is an eigenfunction of the Hamiltonian, the variance
@@ -100,9 +53,9 @@ If \(\ket{\Psi_{T}}\) is an eigenfunction of the Hamiltonian, the variance
 \end{equation*}
 
 The variational principle expands on this idea by letting \(\ket{\Psi_{T}}\) be
-a functional class of a \textit{variational parameter} \(\alpha\). By varying
-\(\alpha\) one can find the optimal trial wavefunction within the functional
-class by minimizing \(\sigma^{2}\). 
+a functional class of the \(\theta\), which is an arbitrary finite set of parameters. By varying the parameters
+\(\theta\) one can find the optimal trial wavefunction within the functional
+class by minimizing \(\langle E \rangle \). 
 
 Only a small collection of potentials have analytical solution using the
 variational principle. For most potentials, one must numerically
@@ -142,8 +95,15 @@ which can be computed using Monte Carlo integration as
   \expval{E_{L}} \approx \frac{1}{M}\sum_{i=1}^{M} p(\vb{r}_{i})E_{L}(\vb{r}_{i}).
 \end{align*}
 
-The goal is therefore to minimize minimizing \(\sigma^{2} = \expval{E_{L}^{2}} -
-\expval{E_{L}}^{2}\) over the variational parameter \(\alpha\).
+One way of optimizing the parameters \(\theta\) is by gradient descent, for which we need the gradient $\frac{\partial}{\partial \theta} \langle E \rangle$. It can be shown that for a trial wave function $\psi$, the gradient is given by  
+\begin{align*}
+	\frac{\partial}{\partial \theta} \langle E \rangle 
+	=
+	2\left\langle \frac{\psi'}{\psi}(E_L -\langle E_L \rangle)\right\rangle
+	= 
+	2\left\langle \log(\psi)'(E_L -\langle E_L \rangle)\right\rangle,
+\end{align*}
+where the derivative is with respect to \(\theta\).
 
 
 \subsection{Onebody Density}

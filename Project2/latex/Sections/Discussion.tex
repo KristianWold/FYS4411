@@ -3,7 +3,7 @@
 If not otherwise specified, the results have been derived using the following parameters:
 \begin{itemize}
 	\item Harmonic oscillator frequency $\omega = 1$
-	\item Coulomb interaction strength and shielding constants $\alpha = 1$, $\beta = 0$
+	\item Coulomb interaction strength and shielding constant $\alpha = 1$, $\beta = 0$
 	\item Metropolis step length $1$
 	\item Number of Metropolis steps $\textsf{steps} = 20$
 	\item Batch size of 500
@@ -11,6 +11,7 @@ If not otherwise specified, the results have been derived using the following pa
 	\item Two layer DNN architecture with $32$ nodes each  
 \end{itemize}
 
+Note that because of Tensorflows multithreading, the training procedure is not deterministic, even when using seed. Because of this, small differences in results will occur from run to run.
 
 \subsection{Pure DNN Model for One Particle In Harmonic Oscillator}
 \subsubsection{One Particle in 1D Harmonic Oscillator, ReLU vs tanh}
@@ -21,11 +22,10 @@ If not otherwise specified, the results have been derived using the following pa
 	\label{fig:one_part_func}
 \end{figure}
 
-To examine the performance and behavior of wave function Ansatz by DNN, we begin with
-a simple system of one particle in a 1D harmonic oscillator. Both \(\tanh\) and
+To examine the performance and behavior of neural network based trial wave functions, we start with a pure DNN trial wave function on a simple system of one particle in a 1D harmonic oscillator. Both \(\tanh\) and
 ReLU activation functions were used to compare their performance. The
 Metropolis step length was set to \(2\) to yield a \(50\%\) acceptance rate. The
-resulting wave function is shown in~\cref{fig:one_part_training1}.
+resulting wave function is shown in~\cref{fig:one_part_func}.
 Upon first inspection, the trial wave function with ReLU activation 
 fails spectacularly in approximating the analytical result, while
 $\tanh$ produces a very close-lying approximation.
@@ -139,10 +139,10 @@ concern for choice of parameters,all models but the ReLU model produces results
 to accurate to within $1\%-3\%$ of the analytical values. 
 
 
-\subsection{RNN-DNN Hybrid Model for Non-Interacting Bosonic Quantum Dots}
+\subsection{RNN-DNN Model for Non-Interacting Bosonic Quantum Dots}
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_nonint_training1.pdf}
-	\caption{Estimate of energy during training of RNN-DNN hybrid models. The models were trained on two non-interacting bosons in 2D and 3D harmonic oscillator. The models were trained for 1000 epochs, using a batch size of 500.}
+	\caption{Estimate of energy during training of RNN-DNN models. The models were trained on two non-interacting bosons in 2D and 3D harmonic oscillator. The models were trained for 1000 epochs, using a batch size of 500.}
 	\label{fig:many_part_nonint_training1}
 \end{figure}
 
@@ -161,12 +161,12 @@ RNN-DNN uses the hidden state to encode the correlation with previously sampled
 particles, it has no problem learning the ground state of uncorrelated systems,
 as seen from the figures. Note that in
 \autoref{fig:many_part_nonint_training2}, a sudden dip in the energy in the
-beginning training can be seen for $N=6$ in 3D. This dip violates the
+beginning training can be seen for both the models. This dip violates the
 variational principle. As nothing was done to regularize the trial wave
 function, it is perhaps unnormalizable during early stages of training, since
 the initial parameters are random. This will likely cause the metropolis
 algorithm to fail, as it is not possible to sample from such a distribution.
-Nevertheless, the model approaches the correct ground state energy. 
+Nevertheless, the model approaches the correct ground state energy eventually. 
 
 \begin{table}[ht]
 	\begin{tabular}{l|SS}
@@ -232,17 +232,13 @@ RBM, it struggles to reproduce the correct one-body density.
 
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_con1.pdf}
-	\caption{One-body density for two interacting bosons in 1D harmonic
-      oscillator. The density was calculated using $N=\num{4e5}$ samples and $100$
-      bins on the interval $[-8,8]$.} 
+	\caption{Probability density $P(x_1)$ of the first sampled boson for the system with two interacting bosons in 1D harmonic oscillator.} 
 	\label{fig:many_part_con1}
 \end{figure}
 
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_con2.pdf}
-	\caption{One-body density for two interacting bosons in 1D harmonic
-      oscillator. The density was calculated using $N=\num{4e5}$ samples and $100$
-      bins on the interval $[-8,8]$.} 
+	\caption{Conditional probability density $P(x_2|x_1)$ of the second sampeled boson for the system with two interacting bosons in 1D harmonic oscillator.} 
 	\label{fig:many_part_con2}
 \end{figure}
 
@@ -273,9 +269,7 @@ potential, which works to push the particles apart.
 
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_met.pdf}
-	\caption{One-body density for two interacting bosons in 1D harmonic
-      oscillator. The density was calculated using $N=\num{4e5}$ samples and $100$
-      bins on the interval $[-8,8]$.} 
+	\caption{Probability density produced with Bruteforce Metropolis, using a step length of 1 and various number of steps. The target probability distribution is the conditional distribution $P(x_2|x_1=0.5)$, as discussed in the previous section.} 
 	\label{fig:many_part_met}
 \end{figure}
 
@@ -288,7 +282,7 @@ with a step length of $1$ and varying number of thermalization steps. For a
 low number of steps, such as $10$, it can be seen from the figure that the
 estimated density does not match the one produced by the model. Since the random
 walkers start off uniformly, they need a sufficient amount of steps so that they
-don't end up getting stuck in low probability areas, as seen to the left in the
+don't end up getting stuck in low probability areas, as seen to the right in the
 figure. If this happens, we fail to sample variables that are distributed as our
 model dictates. This is remedied by taking ample amount of steps.
 \subsection{RNN-DNN Model for Two Interacting Bosons In Higher Dimensions}
@@ -298,7 +292,7 @@ model dictates. This is remedied by taking ample amount of steps.
 \begin{table}[ht]
 	\begin{tabular}{r|SS}
 		\toprule
-		      & {RNN-DNN}   & {DMC}     \\
+		      & {RNN-DNN}   & {DMC\cite{samseth2019learning}}     \\
 		2D    & 3.014(3)  &  3.00000(1) \\
 		3D    & 3.751(1)  &   3.730123(3) \\
 		\bottomrule
@@ -312,17 +306,16 @@ From \autoref{tab:3}, we see the estimated ground state energy of the RNN-DNN mo
 \subsubsection{One-Body Density}
 \begin{figure}[H]
 	\includegraphics[]{figures/many_part_3D.pdf}
-	\caption{One-body density for two interacting bosons in 1D harmonic
-      oscillator. The density was calculated using $N=\num{4e5}$ samples and $100$
-      bins on the interval $[-8,8]$.} 
+	\caption{Radial One-body density for two interacting bosons in 3D harmonic
+      oscillator. The density was calculated using $N=\num{1e6}$ samples and $100$
+      bins on the interval $[0,3]$.} 
 	\label{fig:many_part_3D}
 \end{figure}
 
 \begin{figure}[H]
 	\includegraphics[scale=0.6]{figures/onebody3d.png}
-	\caption{One-body density for two interacting bosons in 1D harmonic
-      oscillator. The density was calculated using $N=\num{4e5}$ samples and $100$
-      bins on the interval $[-8,8]$.} 
+	\caption{Radial One-body density for two interacting bosons in 3D harmonic
+		oscillator. \cite{samseth2019learning}} 
 	\label{fig:many_part_DMC}
 \end{figure}
 

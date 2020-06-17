@@ -115,8 +115,8 @@ diagram is shown in~\cref{fig:architecture}.
 It consists of three main parts: a DNN, a RNN and a MCMC sampler.
 
 
-The DNN receives the position \(\vb{x}\) of a particle as input and evaluates the
-position wave function \(\psi(\vb{x})\). It has two fully connected layers of
+The DNN receives the position \(\vb{x}_i\) of a particle concatenated with the hidden state from the RNN as input and evaluates the
+conditional wave function \(\psi(\vb{x}_i|\vb{x}_{i-1}, \cdots, \vb{x}_{0})\). It has two fully connected layers of
 \(32\) or \(64\) neurons. Both \(\tanh\) and \(ReLu\) were tried as activation
 functions to study their influence on the result. 
 
@@ -137,9 +137,6 @@ function of the subsequent particle becomes dependent on the position of all
 previous particles by the autoregressive property of the RNN. The resulting
 Metropolis samples are therefore uncorrelated, obviating the need for blocking.
 
-\subsection{Metropolis Sampling}
-
-
 \subsection{Automatic Differentiation in Tensorflow}
 Since we are studying Hamiltonians defined on continuous space, calculating the
 Laplacian of the trial wave function is necessary to account for the kinetic
@@ -150,7 +147,7 @@ respect to the inputs(the positions). However, for more than one dimensional
 input, it turns out to be quite difficult, although a work-around proposed by~\cite{laplace}
 resolved the difficulty. The problem was as follow:  
 
-Starting with an input $x$ of dimension $(\textsf{batch\_size}, d)$, a forward
+Starting with an input $x$ of dimension \textsf{(batch\_size, d)}, a forward
 pass through the model results in an output $y$ of dimension $(\textsf{batch\_size}, 1)$,
 as the wave function evaluates to a scalar value. When performing
 \mintinline{python}{grad_y = tf.gradients(y,x)}, we get  
